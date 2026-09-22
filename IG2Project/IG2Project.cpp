@@ -1,5 +1,5 @@
 #include "IG2Project.h"
-
+#include "Maze.h"
 using namespace std;
 using namespace Ogre;
 
@@ -22,6 +22,7 @@ bool IG2Project::keyPressed(const OgreBites::KeyboardEvent& evt) {
 
 void IG2Project::shutdown() {
 
+    delete mMaze;
     mShaderGenerator->removeSceneManager(mSM);
     mSM->removeRenderQueueListener(mOverlaySystem);
 
@@ -132,12 +133,15 @@ void IG2Project::setupScene(void) {
     //------------------------------------------------------------------------
    // Creating the dragon
 
-    Ogre::Entity* entDragon = mSM->createEntity("dragon.mesh");
-    Ogre::SceneNode* mDragonNode = mSM->getRootSceneNode()->createChildSceneNode("nDragon");
-    mDragonNode->attachObject(entDragon);
+    //Ogre::Entity* entDragon = mSM->createEntity("dragon.mesh");
+    //Ogre::SceneNode* mDragonNode = mSM->getRootSceneNode()->createChildSceneNode("nDragon");
+    //mDragonNode->attachObject(entDragon);
 
     // Show bounding box
-    mDragonNode->showBoundingBox(true);
+    //mDragonNode->showBoundingBox(true);
+
+    mMaze = new Maze(Vector3{0,0,0},mSM->createSceneNode(),mSM,"cube.mesh"/*posicion,scenenode,scenemanager,la malla*/);
+    mMaze->createMaze("map.txt");
 
     // Set position of the dragon
     //mDragonNode->setPosition(x, y, z);
