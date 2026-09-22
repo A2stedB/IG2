@@ -6,6 +6,7 @@
 class Casilla : public IG2Object
 {
 public:
+	Casilla() {};
 	Casilla(bool movable, Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh);
 
 private:
@@ -25,6 +26,7 @@ public:
 private:
 	int num_row;
 	int num_column;
-	std::vector<std::vector<Casilla>> maze;
+
+	std::vector<std::vector<Casilla*>> maze;
 };
 

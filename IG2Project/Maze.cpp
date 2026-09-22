@@ -24,24 +24,34 @@ void Maze::createMaze(std::string stageFileName)
 	stageFile >> num_row;
 	stageFile >> num_column;
 
-	maze.reserve(3);
+	maze.resize(num_row);
 
 	for (int i = 0; i < num_row;++i) {
-		for (int j = 0; j < num_column;++i) {
+
+		for (int j = 0; j < num_column; ++j) {
 			char type;
 			stageFile >> type;
 
+			Vector3 pos(j * block_size, 0, i * block_size);
+
+			SceneNode* node = mSM->getRootSceneNode()->createChildSceneNode();
+
 			if (type == MURO) {
-				maze[i].push_back(Casilla(false, Vector3{0,0,0},mNode,mSM,"cube.mesh"));
+				
+				Casilla* bloque = new Casilla(false, pos, node, mSM, "cube.mesh");
+				maze[i].push_back(bloque);
 			}
 			else if (type == HUECO) {
-				maze[i].push_back(Casilla(true, Vector3{ 0,0,0 }, mNode, mSM, "cube.mesh"));
-				maze[i][j].setVisible(false);
+
+				Casilla* bloque = new Casilla(true, pos, node, mSM, "cube.mesh");
+				bloque->setVisible(false);
+				maze[i].push_back(bloque);
 			}
 			else
 				throw 1;
 		}
 	}
+
 
 	stageFile.close();
 }

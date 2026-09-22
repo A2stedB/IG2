@@ -71,8 +71,8 @@ void IG2Project::setupScene(void) {
     mCamNode = mSM->getRootSceneNode()->createChildSceneNode("nCam");
     mCamNode->attachObject(cam);
 
-    mCamNode->setPosition(0, 0, 1000);
-    mCamNode->lookAt(Ogre::Vector3(0, 0, 0), Ogre::Node::TS_WORLD);
+    mCamNode->setPosition(0, 1000, 0);
+    mCamNode->lookAt(Ogre::Vector3(0, -1, 0), Ogre::Node::TS_WORLD);
 
     // and tell it to render into the main window
     Viewport* vp = getRenderWindow()->addViewport(cam);
@@ -93,7 +93,7 @@ void IG2Project::setupScene(void) {
 
     mLightNode = mSM->getRootSceneNode()->createChildSceneNode("nLuz");
     mLightNode->attachObject(luz);
-    mLightNode->setDirection(Ogre::Vector3(-1, -1, -1));
+    mLightNode->setDirection(Ogre::Vector3(1, 1, 1));
  
 
     //------------------------------------------------------------------------
@@ -140,7 +140,7 @@ void IG2Project::setupScene(void) {
     // Show bounding box
     //mDragonNode->showBoundingBox(true);
 
-    mMaze = new Maze(Vector3{0,0,0},mSM->createSceneNode(),mSM,"cube.mesh"/*posicion,scenenode,scenemanager,la malla*/);
+    mMaze = new Maze(Vector3{0,0,0},mSM->getRootSceneNode()->createChildSceneNode(),mSM,"cube.mesh"/*posicion,scenenode,scenemanager,la malla*/);
     mMaze->createMaze("map.txt");
 
     // Set position of the dragon
