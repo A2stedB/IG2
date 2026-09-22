@@ -3,14 +3,14 @@
 
 constexpr const char MURO = 'x';
 constexpr const char HUECO = 'o';
-const int block_size = 100;
+const int block_size = 20;
 
 Casilla::Casilla(bool movable, Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh) : IG2Object(initPos,node,sceneMng,mesh)
 {
 	can_move = movable;
 }
 
-Maze::Maze(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh) : IG2Object(initPos,node,sceneMng,mesh)
+Maze::Maze(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh) : IG2Object(initPos,node,sceneMng)
 {
 }
 
@@ -26,7 +26,7 @@ void Maze::createMaze(std::string stageFileName)
 
 	maze.resize(num_row);
 
-	for (int i = 0; i < num_row;++i) {
+	for (int i = 0; i < num_row; ++i) {
 
 		for (int j = 0; j < num_column; ++j) {
 			char type;
@@ -34,24 +34,39 @@ void Maze::createMaze(std::string stageFileName)
 
 			Vector3 pos(j * block_size, 0, i * block_size);
 
-			SceneNode* node = mSM->getRootSceneNode()->createChildSceneNode();
+			SceneNode* node = this->createChildSceneNode();
+
+			Casilla* bloque;
 
 			if (type == MURO) {
-				
-				Casilla* bloque = new Casilla(false, pos, node, mSM, "cube.mesh");
-				maze[i].push_back(bloque);
+
+				bloque = new Casilla(false, pos, node, mSM, "cube.mesh");
+				node->showBoundingBox(true);
 			}
 			else if (type == HUECO) {
 
-				Casilla* bloque = new Casilla(true, pos, node, mSM, "cube.mesh");
+				bloque = new Casilla(true, pos, node, mSM, "cube.mesh");
 				bloque->setVisible(false);
-				maze[i].push_back(bloque);
 			}
 			else
 				throw 1;
+
+			//redimensionar escalando
+			Vector3 size = bloque->calculateBoxSize();
+			float propX, propY, propZ;
+
+			propX = block_size / size.x;
+			propY = block_size / size.y;
+			propZ = block_size / size.z;
+
+			bloque->setScale(Vector3(propX, propY, propZ));
+
+			maze[i].push_back(bloque);
 		}
 	}
 
+	// colocarlo en el centro
+	this->setPosition(Vector3(-(num_column * block_size / 2), 0, -(num_row * block_size / 2)));
 
 	stageFile.close();
 }
