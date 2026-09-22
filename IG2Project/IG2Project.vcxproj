@@ -186,7 +186,10 @@
       <EnableSegmentHeap>true</EnableSegmentHeap>
     </Manifest>
     <PostBuildEvent>
-      <Command>xcopy /y /e "$(SolutionDir)cfg\*.cfg" "$(OutputPath)"
+      <Command>xcopy /y /e /d "C:\software\programacion\ogre-14.3.4-x64-debug\bin\debug\*.dll" "$(OutputPath)"
+xcopy /y /e /d "C:\software\programacion\ogre-14.3.4-x64-debug\bin\debug\*.pdb" "$(OutputPath)"
+xcopy /y /e /d "C:\software\programacion\ogre-14.3.4-x64-debug\bin\debug\*.exe" "$(OutputPath)"
+xcopy /y /e /d "$(SolutionDir)cfg\*.cfg" "$(OutputPath)"
 powershell -ExecutionPolicy Bypass -File "$(SolutionDir)pos-build.ps1" -Place "Lab" -Mode "Debug" -target "$(TargetDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -210,7 +213,10 @@ powershell -ExecutionPolicy Bypass -File "$(SolutionDir)pos-build.ps1" -Place "L
       <EnableSegmentHeap>true</EnableSegmentHeap>
     </Manifest>
     <PostBuildEvent>
-      <Command>xcopy /y /e "$(SolutionDir)cfg\*.cfg" "$(OutputPath)"
+      <Command>xcopy /y /e /d "$(SolutionDir)lib\ogre-14.3.4-x64-debug\bin\debug\*.dll" "$(OutputPath)"
+xcopy /y /e /d "$(SolutionDir)lib\ogre-14.3.4-x64-debug\bin\debug\*.pdb" "$(OutputPath)"
+xcopy /y /e /d "$(SolutionDir)lib\ogre-14.3.4-x64-debug\bin\debug\*.exe" "$(OutputPath)"
+xcopy /y /e /d "$(SolutionDir)cfg\*.cfg" "$(OutputPath)"
 powershell -ExecutionPolicy Bypass -File "$(SolutionDir)pos-build.ps1" -Place "Home" -Mode "Debug" -target "$(TargetDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
