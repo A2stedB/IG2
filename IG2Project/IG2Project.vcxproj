@@ -27,12 +27,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Casilla.cpp" />
+    <ClCompile Include="Hero.cpp" />
     <ClCompile Include="IG2Object.cpp" />
     <ClCompile Include="IG2Project.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Maze.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Casilla.h" />
+    <ClInclude Include="Hero.h" />
     <ClInclude Include="IG2Object.h" />
     <ClInclude Include="IG2Project.h" />
     <ClInclude Include="Maze.h" />

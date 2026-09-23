@@ -17,6 +17,7 @@
 #include <OgreWindowEventUtilities.h>
 #include <SDL_keycode.h>
 #include "Maze.h"
+#include "Hero.h"
 
 
 class IG2Project: public OgreBites::ApplicationContext, OgreBites::InputListener {
@@ -25,11 +26,17 @@ public:
     explicit IG2Project() : OgreBites::ApplicationContext("IG2Project") {};
     virtual ~IG2Project() {};
 
+    Vector3 getNextDir() const;
+    bool isDirectionModified() const;
+    Quaternion getQuaternionForNewDirection() const;
 protected:
+    virtual void frameRendered(const Ogre::FrameEvent& evt);
     virtual bool keyPressed(const OgreBites::KeyboardEvent& evt);
     virtual void setup();
     virtual void shutdown();
     virtual void setupScene();
+
+    Vector3 nextDir;
 
 
     Ogre::SceneNode* mSinbadNode = nullptr;
@@ -45,6 +52,7 @@ protected:
     OgreBites::CameraMan* mCamMgr = nullptr;
 
     Maze* mMaze = nullptr;
+    Hero* mHero = nullptr;
 };
 
 #endif

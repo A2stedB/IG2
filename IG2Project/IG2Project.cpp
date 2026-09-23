@@ -3,6 +3,30 @@
 using namespace std;
 using namespace Ogre;
 
+constexpr float SPEED = 30;
+
+bool IG2Project::isDirectionModified() const
+{
+    return mHero->getCurrentDirection() != nextDir;
+}
+
+Quaternion IG2Project::getQuaternionForNewDirection() const
+{
+    return Quaternion(mHero->getCurrentDirection().getRotationTo(nextDir));
+}
+
+void IG2Project::frameRendered(const Ogre::FrameEvent& evt)
+{
+    if (mHero != nullptr) {
+        if (!isDirectionModified()) {
+            mHero->move(mHero->getCurrentDirection() * SPEED * evt.timeSinceLastFrame);
+        }
+        else {
+            mHero->rotate(getQuaternionForNewDirection());
+        }
+        std::cout << mHero->getCurrentDirection() << std::endl;
+    }
+}
 
 bool IG2Project::keyPressed(const OgreBites::KeyboardEvent& evt) {
 
@@ -11,14 +35,29 @@ bool IG2Project::keyPressed(const OgreBites::KeyboardEvent& evt) {
         getRoot()->queueEndRendering();
     }
 
+    // Print the Sinbad's position
     else if (evt.keysym.sym == SDLK_k) {
         cout << "Position of Sinbad: " << mSinbadNode->getPosition() << endl;
-        cout << "Position of the camera: " << mCamNode->getPosition() << endl;
+    }
+    else if (evt.keysym.sym == SDLK_UP) {
+        cout << "Pressed UP" << endl;
+        nextDir = Vector3::NEGATIVE_UNIT_Z;
+    }
+    else if (evt.keysym.sym == SDLK_DOWN) {
+        cout << "Pressed DOWN" << endl;
+        nextDir = Vector3::UNIT_Z;
+    }
+    else if (evt.keysym.sym == SDLK_LEFT) {
+        cout << "Pressed LEFT" << endl;
+        nextDir = Vector3::NEGATIVE_UNIT_X;
+    }
+    else if (evt.keysym.sym == SDLK_RIGHT) {
+        cout << "Pressed RIGHT" << endl;
+        nextDir = Vector3::UNIT_X;
     }
 
     return true;
 }
-
 
 void IG2Project::shutdown() {
 
@@ -71,8 +110,8 @@ void IG2Project::setupScene(void) {
     mCamNode = mSM->getRootSceneNode()->createChildSceneNode("nCam");
     mCamNode->attachObject(cam);
 
-    mCamNode->setPosition(0, 1000, 0);
-    mCamNode->lookAt(Ogre::Vector3(0, -1, 0), Ogre::Node::TS_WORLD);
+    mCamNode->setPosition(0, -1000, 200);
+    mCamNode->lookAt(Ogre::Vector3(0, 1, -1.5), Ogre::Node::TS_WORLD);
 
     // and tell it to render into the main window
     Viewport* vp = getRenderWindow()->addViewport(cam);
@@ -93,7 +132,7 @@ void IG2Project::setupScene(void) {
 
     mLightNode = mSM->getRootSceneNode()->createChildSceneNode("nLuz");
     mLightNode->attachObject(luz);
-    mLightNode->setDirection(Ogre::Vector3(1, 1, 1));
+    mLightNode->setDirection(Ogre::Vector3(-1, -1, -1));
  
 
     //------------------------------------------------------------------------
@@ -137,11 +176,13 @@ void IG2Project::setupScene(void) {
     //Ogre::SceneNode* mDragonNode = mSM->getRootSceneNode()->createChildSceneNode("nDragon");
     //mDragonNode->attachObject(entDragon);
 
-    // Show bounding box
+    //// Show bounding box
     //mDragonNode->showBoundingBox(true);
 
     mMaze = new Maze(Vector3{0,0,0},mSM->getRootSceneNode()->createChildSceneNode(),mSM,"cube.mesh"/*posicion,scenenode,scenemanager,la malla*/);
     mMaze->createMaze("map.txt");
+
+    mHero = new Hero(mMaze->getHeroStartPosition(), mSM->getRootSceneNode()->createChildSceneNode(), mSM, "Sinbad.mesh");
 
     // Set position of the dragon
     //mDragonNode->setPosition(x, y, z);

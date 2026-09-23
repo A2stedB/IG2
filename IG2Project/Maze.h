@@ -2,16 +2,10 @@
 #include "IG2Object.h"
 #include <vector>
 #include <string>
+#include "Casilla.h"
 
-class Casilla : public IG2Object
-{
-public:
-	Casilla() {};
-	Casilla(bool movable, Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh);
 
-private:
-	bool can_move;
-};
+
 
 
 class Maze : public IG2Object
@@ -21,12 +15,17 @@ public:
 
 	void createMaze(std::string stageFileName);
 
+	Vector3 getHeroStartPosition() const;
 	// Hacer un metodo para add bloques
 
 private:
 	int num_row;
 	int num_column;
+	Vector3 hero_position;
 
 	std::vector<std::vector<Casilla*>> maze;
 };
+
+// Una clase casilla
+
 
