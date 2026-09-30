@@ -17,14 +17,20 @@ Quaternion IG2Project::getQuaternionForNewDirection() const
 
 void IG2Project::frameRendered(const Ogre::FrameEvent& evt)
 {
+    // Separar la logica en otro lado??
     if (mHero != nullptr) {
         if (!isDirectionModified()) {
             mHero->move(mHero->getCurrentDirection() * SPEED * evt.timeSinceLastFrame);
         }
         else {
             mHero->rotate(getQuaternionForNewDirection());
+            mHero->setDirection(nextDir);
+            
         }
-        std::cout << mHero->getCurrentDirection() << std::endl;
+
+        mMaze->setHeroPosition(mHero->getPosition()); // Puede que explote por tema de posicion local y global?
+
+        //std::cout << mHero->getCurrentDirection() << std::endl;
     }
 }
 

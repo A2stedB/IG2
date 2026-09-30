@@ -10,3 +10,8 @@ Vector3 Hero::getCurrentDirection() const
 {
 	return current_direction;
 }
+
+void Hero::setDirection(Vector3 vector)
+{
+	current_direction = vector;
+}

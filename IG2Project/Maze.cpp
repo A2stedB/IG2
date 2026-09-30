@@ -23,6 +23,8 @@ void Maze::createMaze(std::string stageFileName)
 
 	maze.resize(num_row);
 
+	this->offset = Vector3(-(num_column * block_size / 2), 0, -(num_row * block_size / 2));
+
 	for (int i = 0; i < num_row; ++i) {
 
 		for (int j = 0; j < num_column; ++j) {
@@ -68,12 +70,35 @@ void Maze::createMaze(std::string stageFileName)
 		}
 	}
 	// colocarlo en el centro
-	this->setPosition(Vector3(-(num_column * block_size / 2), 0, -(num_row * block_size / 2)));
+	this->setPosition(this->offset);
 
 	stageFile.close();
 };
 
 Vector3 Maze::getHeroStartPosition() const
 {
-	return hero_position + Vector3(-(num_column * block_size / 2), 0, -(num_row * block_size / 2));
+	return hero_position + this->offset; // *El heroe tiene posicion global*
+}
+
+void Maze::setHeroPosition(Vector3 vector)
+{
+	hero_position = vector - this->offset; // Relativo al nodo del laberinto
+	//std::cout << hero_position << std::endl;
+	//std::cout << "Vector: " << vector << std::endl;
+}
+
+bool Maze::can_turn(Vector3 position, Vector3 direction)
+{
+	
+	return false;
+}
+
+Vector3 Maze::getHeroPosition() const
+{
+	return hero_position;
+}
+
+void Maze::moveHero()
+{
+	
 }
