@@ -3,12 +3,6 @@
 using namespace std;
 using namespace Ogre;
 
-constexpr float SPEED = 30;
-
-bool IG2Project::isDirectionModified() const
-{
-    return mHero->getCurrentDirection() != nextDir;
-}
 
 Quaternion IG2Project::getQuaternionForNewDirection() const
 {
@@ -18,19 +12,8 @@ Quaternion IG2Project::getQuaternionForNewDirection() const
 void IG2Project::frameRendered(const Ogre::FrameEvent& evt)
 {
     // Separar la logica en otro lado??
-    if (mHero != nullptr) {
-        if (!isDirectionModified()) {
-            mHero->move(mHero->getCurrentDirection() * SPEED * evt.timeSinceLastFrame);
-        }
-        else {
-            mHero->rotate(getQuaternionForNewDirection());
-            mHero->setDirection(nextDir);
-            
-        }
-
-        mMaze->setHeroPosition(mHero->getPosition()); // Puede que explote por tema de posicion local y global?
-
-        //std::cout << mHero->getCurrentDirection() << std::endl;
+    if (mHero != nullptr && mMaze != nullptr) {
+		mMaze->moveHero(mHero, evt.timeSinceLastFrame);
     }
 }
 
@@ -61,6 +44,8 @@ bool IG2Project::keyPressed(const OgreBites::KeyboardEvent& evt) {
         cout << "Pressed RIGHT" << endl;
         nextDir = Vector3::UNIT_X;
     }
+
+	mHero->setDirection(nextDir);
 
     return true;
 }

@@ -3,6 +3,9 @@
 #include <vector>
 #include <string>
 #include "Casilla.h"
+#include "Hero.h"
+
+class Hero;
 
 class Maze : public IG2Object
 {
@@ -22,7 +25,13 @@ public:
 	
 	bool is_intersection() const;
 
-	void moveHero();
+	Casilla* getCasillaAtPosition(Vector3 position);
+
+	void moveHero(Hero* hero, float dt);
+
+	void stepForward(Hero* hero, Casilla* charBloack, Casilla* frontBlock, float dt);
+
+	bool blockCenterReached(Vector3 difference, Vector3 direction);
 private:
 	Vector3 offset;
 	int num_row;

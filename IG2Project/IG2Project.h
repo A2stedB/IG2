@@ -26,8 +26,6 @@ public:
     explicit IG2Project() : OgreBites::ApplicationContext("IG2Project") {};
     virtual ~IG2Project() {};
 
-    Vector3 getNextDir() const;
-    bool isDirectionModified() const;
     Quaternion getQuaternionForNewDirection() const;
 protected:
     virtual void frameRendered(const Ogre::FrameEvent& evt);

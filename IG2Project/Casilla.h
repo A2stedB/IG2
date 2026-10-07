@@ -7,6 +7,7 @@ public:
 	Casilla() {};
 	Casilla(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh);
 	Casilla(Vector3 initPos, SceneNode* node, SceneManager* sceneMng);
+	bool canPassThrough();
 protected:
 	bool can_move;
 };

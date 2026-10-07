@@ -10,6 +10,11 @@ Casilla::Casilla(Vector3 initPos, SceneNode* node, SceneManager* sceneMng) : IG2
 
 }
 
+bool Casilla::canPassThrough()
+{
+	return can_move;
+}
+
 Hueco::Hueco(Vector3 initPos, SceneNode* node, SceneManager* sceneMng) :
 	Casilla(initPos,node,sceneMng)
 {

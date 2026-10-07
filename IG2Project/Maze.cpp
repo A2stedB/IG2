@@ -1,4 +1,5 @@
 #include "Maze.h"
+#include <cmath>
 #include <fstream>
 
 constexpr const char MURO = 'x';
@@ -98,7 +99,76 @@ Vector3 Maze::getHeroPosition() const
 	return hero_position;
 }
 
-void Maze::moveHero()
-{
-	
+void Maze::stepForward(Hero* hero, Casilla* charBlock, Casilla* frontBlock, float dt) {
+	if (frontBlock != nullptr && charBlock != nullptr) {
+		if (frontBlock->canPassThrough()) {
+			hero->move(hero->getGridOrientation() * Hero::HERO_SPEED * dt);
+		}
+	}
 }
+
+bool Maze::blockCenterReached(Vector3 difference, Vector3 direction) {
+	if (direction == Vector3::UNIT_X || direction == Vector3::NEGATIVE_UNIT_X) {
+		return abs(difference.x) < 0.5f;
+	}
+	else if (direction == Vector3::UNIT_Z || direction == Vector3::NEGATIVE_UNIT_Z) {
+		return abs(difference.z) < 0.5f;
+	}
+	else {
+		return false;
+	}
+}
+
+Casilla* Maze::getCasillaAtPosition(Vector3 position) {
+
+	Vector3 localPos = position - this->offset;
+	int row, col;
+	row = localPos.z / block_size;
+	col = localPos.x / block_size;
+
+	return maze[row][col];
+}
+
+
+void Maze::moveHero(Hero* hero,float dt)
+{
+	Casilla* charBlock;
+	Casilla* inFrontBlock;
+
+	charBlock = this->getCasillaAtPosition(hero->getPosition());
+
+	inFrontBlock = this->getCasillaAtPosition(hero->getPosition() + (hero->getGridOrientation() * block_size));
+
+	if (hero->getDirectionModified()) {
+		stepForward(hero, charBlock, inFrontBlock, dt);
+		std::cout << "not changed direction" << std::endl;
+	}
+	else {
+
+		Casilla* nextBlock = this->getCasillaAtPosition((hero->getPosition() + (hero->getCurrentDirection() * block_size)));
+
+		Vector3 localPos = hero->getPosition() - this->offset;
+
+		Vector3 newPos = localPos + (hero->getGridOrientation() * Hero::HERO_SPEED * dt);
+	
+		Vector3 difference = Vector3(newPos.x - charBlock->getPosition().x,0, newPos.z - charBlock->getPosition().z);
+
+		std::cout << "Difference: " << difference << std::endl;
+
+		std::cout << "nextblock: " << nextBlock << " " << nextBlock->canPassThrough() << std::endl;
+		if(nextBlock!=nullptr && nextBlock->canPassThrough() && blockCenterReached(difference, hero->getCurrentDirection())) {
+			hero->rotateToDirection();
+			std::cout << "Rotating to direction" << std::endl;
+		}
+		else if (hero->is180turn()) {
+			hero->rotateToDirection();
+
+			std::cout << "Rotating 180" << std::endl;
+		}
+
+		else {
+			stepForward(hero, charBlock, inFrontBlock, dt);
+		}
+	}
+}
+
