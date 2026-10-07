@@ -165,11 +165,10 @@ void Maze::moveHero(Hero* hero,float dt)
 			hero->move(hero->getGridOrientation() * Hero::HERO_SPEED * dt);
 		}
 
-		std::cout << "not changed direction" << std::endl;
 	}
 	else {
 
-		Casilla* nextBlock = this->getCasillaAtPosition(blockCenter + (hero->getCurrentDirection() * block_size)));
+		Casilla* nextBlock = this->getCasillaAtPosition(blockCenter + (hero->getCurrentDirection() * block_size));
 
 		if(nextBlock!=nullptr && nextBlock->canPassThrough() && blockCenterReached(difference, hero->getGridOrientation())) {
 			hero->rotateToDirection();
