@@ -41,35 +41,36 @@ void Maze::createMaze(std::string stageFileName)
 			if (type == HERO)
 			{
 				hero_position = pos;
+				bloque = new Hueco(pos, node, mSM);
 			}
-			else {
-				if (type == MURO)
-				{
-					bloque = new Muro(pos, node, mSM, "cube.mesh");
-					node->showBoundingBox(true);
-				}
-				else if (type == HUECO) {
-
-					bloque = new Hueco(pos, node, mSM);
-				}
-				else
-					throw 1;
-
-				//redimensionar escalando
-				Vector3 size = bloque->calculateBoxSize();
-				float propX, propY, propZ;
-
-				propX = block_size / size.x;
-				propY = block_size / size.y;
-				propZ = block_size / size.z;
-
-				bloque->setScale(Vector3(propX, propY, propZ));
-
-				maze[i].push_back(bloque);
+			else if (type == MURO)
+			{
+				bloque = new Muro(pos, node, mSM, "cube.mesh");
+				node->showBoundingBox(true);
+			}
+			else if (type == HUECO)
+			{
+				bloque = new Hueco(pos, node, mSM);
+			}
+			else
+			{
+				throw 1;
 			}
 
+			//redimensionar escalando
+			Vector3 size = bloque->calculateBoxSize();
+			float propX, propY, propZ;
+
+			propX = block_size / size.x;
+			propY = block_size / size.y;
+			propZ = block_size / size.z;
+
+			bloque->setScale(Vector3(propX, propY, propZ));
+
+			maze[i].push_back(bloque);
+			
 		}
-	}
+	 }
 	// colocarlo en el centro
 	this->setPosition(this->offset);
 
@@ -100,10 +101,9 @@ Vector3 Maze::getHeroPosition() const
 }
 
 void Maze::stepForward(Hero* hero, Casilla* charBlock, Casilla* frontBlock, float dt) {
-	if (frontBlock != nullptr && charBlock != nullptr) {
-		if (frontBlock->canPassThrough()) {
-			hero->move(hero->getGridOrientation() * Hero::HERO_SPEED * dt);
-		}
+	if (frontBlock != nullptr && charBlock != nullptr && frontBlock->canPassThrough()) {
+
+		hero->move(hero->getGridOrientation() * Hero::HERO_SPEED * dt);
 	}
 }
 
@@ -119,12 +119,18 @@ bool Maze::blockCenterReached(Vector3 difference, Vector3 direction) {
 	}
 }
 
-Casilla* Maze::getCasillaAtPosition(Vector3 position) {
+Casilla* Maze::getCasillaAtPosition(Vector3 position)
+{
+	Vector3 localPos = position - offset;
 
-	Vector3 localPos = position - this->offset;
-	int row, col;
-	row = localPos.z / block_size;
-	col = localPos.x / block_size;
+	int row = std::round(localPos.z / block_size);
+
+	int col = std::round(localPos.x / block_size);
+
+	if (row < 0 || row >= num_row || col < 0 || col >= num_column)
+	{
+		return nullptr;
+	}
 
 	return maze[row][col];
 }
@@ -137,37 +143,48 @@ void Maze::moveHero(Hero* hero,float dt)
 
 	charBlock = this->getCasillaAtPosition(hero->getPosition());
 
-	inFrontBlock = this->getCasillaAtPosition(hero->getPosition() + (hero->getGridOrientation() * block_size));
+	Vector3 blockCenter = charBlock->getPosition() + this->offset;
 
-	if (hero->getDirectionModified()) {
-		stepForward(hero, charBlock, inFrontBlock, dt);
+	inFrontBlock = this->getCasillaAtPosition(blockCenter + (hero->getGridOrientation() * block_size));
+
+	Vector3 localPos = hero->getPosition() - this->offset;
+
+	Vector3 newPos = localPos + (hero->getGridOrientation() * Hero::HERO_SPEED * dt);
+
+
+	Vector3 difference = Vector3(newPos.x - charBlock->getPosition().x, 0, newPos.z - charBlock->getPosition().z);
+
+	bool centerReached = blockCenterReached(difference, hero->getGridOrientation());
+
+	if (!hero->getDirectionModified()) {
+
+		if (centerReached) {
+			stepForward(hero, charBlock, inFrontBlock, dt);
+		}
+		else { // si no ha llegado el centro de la casilla actual, mueve hasta el centro
+			hero->move(hero->getGridOrientation() * Hero::HERO_SPEED * dt);
+		}
+
 		std::cout << "not changed direction" << std::endl;
 	}
 	else {
 
-		Casilla* nextBlock = this->getCasillaAtPosition((hero->getPosition() + (hero->getCurrentDirection() * block_size)));
+		Casilla* nextBlock = this->getCasillaAtPosition(blockCenter + (hero->getCurrentDirection() * block_size)));
 
-		Vector3 localPos = hero->getPosition() - this->offset;
-
-		Vector3 newPos = localPos + (hero->getGridOrientation() * Hero::HERO_SPEED * dt);
-	
-		Vector3 difference = Vector3(newPos.x - charBlock->getPosition().x,0, newPos.z - charBlock->getPosition().z);
-
-		std::cout << "Difference: " << difference << std::endl;
-
-		std::cout << "nextblock: " << nextBlock << " " << nextBlock->canPassThrough() << std::endl;
-		if(nextBlock!=nullptr && nextBlock->canPassThrough() && blockCenterReached(difference, hero->getCurrentDirection())) {
+		if(nextBlock!=nullptr && nextBlock->canPassThrough() && blockCenterReached(difference, hero->getGridOrientation())) {
 			hero->rotateToDirection();
-			std::cout << "Rotating to direction" << std::endl;
 		}
 		else if (hero->is180turn()) {
 			hero->rotateToDirection();
-
-			std::cout << "Rotating 180" << std::endl;
 		}
 
 		else {
-			stepForward(hero, charBlock, inFrontBlock, dt);
+			if (centerReached) {
+				stepForward(hero, charBlock, inFrontBlock, dt);
+			}
+			else {
+				hero->move(hero->getGridOrientation() * Hero::HERO_SPEED * dt);
+			}
 		}
 	}
 }

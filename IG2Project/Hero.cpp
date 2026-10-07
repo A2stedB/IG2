@@ -21,15 +21,14 @@ void Hero::setDirection(Vector3 vector)
 
 bool Hero::getDirectionModified() {
 
-	return current_direction == getGridOrientation();
+	return current_direction != getGridOrientation();
 }
-void Hero::rotateToDirection() {
+void Hero::rotateToDirection()
+{
+	Quaternion rotation =
+		getGridOrientation().getRotationTo(current_direction);
 
-	if (!getDirectionModified()) {
-		Quaternion rotation = getGridOrientation().getRotationTo(current_direction);
-		rotate(Quaternion(rotation));
-
-	}
+	rotate(rotation);
 }
 
 bool Hero::is180turn() {
