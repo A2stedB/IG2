@@ -1,10 +1,12 @@
-#include "Maze.h"
+﻿#include "Maze.h"
 #include <cmath>
 #include <fstream>
 
 constexpr const char MURO = 'x';
 constexpr const char HUECO = 'o';
 constexpr const char HERO = 'h';
+constexpr const char FAKE = 'f';
+constexpr const char INVISIBLE = 'i';
 
 const int block_size = 20;
 
@@ -38,23 +40,26 @@ void Maze::createMaze(std::string stageFileName)
 
 			Casilla* bloque;
 
-			if (type == HERO)
-			{
-				hero_position = pos;
-				bloque = new Hueco(pos, node, mSM);
-			}
-			else if (type == MURO)
-			{
-				bloque = new Muro(pos, node, mSM, "cube.mesh");
-				node->showBoundingBox(true);
-			}
-			else if (type == HUECO)
-			{
-				bloque = new Hueco(pos, node, mSM);
-			}
-			else
-			{
-				throw 1;
+			switch (type) {
+			    case HERO:
+					hero_position = pos;
+					bloque = new Hueco(pos, node, mSM);
+					break;
+				case MURO:
+					bloque = new Muro(pos, node, mSM, "cube.mesh");
+					node->showBoundingBox(true);
+					break;
+				case HUECO:
+					bloque = new Hueco(pos, node, mSM);
+					break;
+				case INVISIBLE:
+					bloque = new BloqueInvisible(pos, node, mSM, "cube.mesh");
+					break;
+				case FAKE:
+					bloque = new BloqueFalso(pos, node, mSM, "cube.mesh");
+					break;
+				default:
+					throw 1;
 			}
 
 			//redimensionar escalando
@@ -184,6 +189,16 @@ void Maze::moveHero(Hero* hero,float dt)
 			else {
 				hero->move(hero->getGridOrientation() * Hero::HERO_SPEED * dt);
 			}
+		}
+	}
+}
+
+void Maze::update(float dt) 
+{
+	for (int i = 0; i < num_row; ++i) 
+	{
+		for (int j = 0; j < num_column; ++j) {
+			maze[i][j]->update(dt);
 		}
 	}
 }

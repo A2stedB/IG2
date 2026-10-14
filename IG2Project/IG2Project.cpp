@@ -1,4 +1,4 @@
-#include "IG2Project.h"
+﻿#include "IG2Project.h"
 #include "Maze.h"
 using namespace std;
 using namespace Ogre;
@@ -14,6 +14,7 @@ void IG2Project::frameRendered(const Ogre::FrameEvent& evt)
     // Separar la logica en otro lado??
     if (mHero != nullptr && mMaze != nullptr) {
 		mMaze->moveHero(mHero, evt.timeSinceLastFrame);
+        mMaze->update(evt.timeSinceLastFrame);
     }
 }
 

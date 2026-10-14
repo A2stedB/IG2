@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "IG2Object.h"
 #include <vector>
 #include <string>
@@ -32,6 +32,8 @@ public:
 	void stepForward(Hero* hero, Casilla* charBloack, Casilla* frontBlock, float dt);
 
 	bool blockCenterReached(Vector3 difference, Vector3 direction);
+
+	void update(float dt);
 private:
 	Vector3 offset;
 	int num_row;
