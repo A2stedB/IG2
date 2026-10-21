@@ -1,6 +1,7 @@
 ﻿#include "Maze.h"
 #include <cmath>
 #include <fstream>
+#include "Character.h"
 
 constexpr const char MURO = 'x';
 constexpr const char HUECO = 'o';
@@ -105,10 +106,10 @@ Vector3 Maze::getHeroPosition() const
 	return hero_position;
 }
 
-void Maze::stepForward(Hero* hero, Casilla* charBlock, Casilla* frontBlock, float dt) {
+void Maze::stepForward(Character* hero, Casilla* charBlock, Casilla* frontBlock, float dt) {
 	if (frontBlock != nullptr && charBlock != nullptr && frontBlock->canPassThrough()) {
 
-		hero->move(hero->getGridOrientation() * Hero::HERO_SPEED * dt);
+		hero->move(hero->getGridOrientation() * hero->getSpeed() * dt);
 	}
 }
 
@@ -141,7 +142,7 @@ Casilla* Maze::getCasillaAtPosition(Vector3 position)
 }
 
 
-void Maze::moveHero(Hero* hero,float dt)
+void Maze::moveCharacter(Character* hero,float dt)
 {
 	Casilla* charBlock;
 	Casilla* inFrontBlock;
@@ -154,7 +155,7 @@ void Maze::moveHero(Hero* hero,float dt)
 
 	Vector3 localPos = hero->getPosition() - this->offset;
 
-	Vector3 newPos = localPos + (hero->getGridOrientation() * Hero::HERO_SPEED * dt);
+	Vector3 newPos = localPos + (hero->getGridOrientation() * hero->getSpeed() * dt);
 
 
 	Vector3 difference = Vector3(newPos.x - charBlock->getPosition().x, 0, newPos.z - charBlock->getPosition().z);
@@ -167,15 +168,16 @@ void Maze::moveHero(Hero* hero,float dt)
 			stepForward(hero, charBlock, inFrontBlock, dt);
 		}
 		else { // si no ha llegado el centro de la casilla actual, mueve hasta el centro
-			hero->move(hero->getGridOrientation() * Hero::HERO_SPEED * dt);
+			hero->move(hero->getGridOrientation() * hero->getSpeed() * dt);
 		}
 
 	}
+
 	else {
 
 		Casilla* nextBlock = this->getCasillaAtPosition(blockCenter + (hero->getCurrentDirection() * block_size));
 
-		if(nextBlock!=nullptr && nextBlock->canPassThrough() && blockCenterReached(difference, hero->getGridOrientation())) {
+		if (nextBlock != nullptr && nextBlock->canPassThrough() && blockCenterReached(difference, hero->getGridOrientation())) {
 			hero->rotateToDirection();
 		}
 		else if (hero->is180turn()) {
@@ -187,14 +189,17 @@ void Maze::moveHero(Hero* hero,float dt)
 				stepForward(hero, charBlock, inFrontBlock, dt);
 			}
 			else {
-				hero->move(hero->getGridOrientation() * Hero::HERO_SPEED * dt);
+				hero->move(hero->getGridOrientation() * hero->getSpeed() * dt);
 			}
 		}
 	}
 }
 
-void Maze::update(float dt) 
+void Maze::update(float dt, Hero* hero, Villano *villano) 
 {
+	moveCharacter(hero,dt);
+	moveCharacter(villano,dt);
+
 	for (int i = 0; i < num_row; ++i) 
 	{
 		for (int j = 0; j < num_column; ++j) {

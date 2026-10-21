@@ -4,6 +4,7 @@
 #include <string>
 #include "Casilla.h"
 #include "Hero.h"
+#include "Villano.h"
 
 class Hero;
 
@@ -27,13 +28,13 @@ public:
 
 	Casilla* getCasillaAtPosition(Vector3 position);
 
-	void moveHero(Hero* hero, float dt);
+	void moveCharacter(Character* hero, float dt);
 
-	void stepForward(Hero* hero, Casilla* charBloack, Casilla* frontBlock, float dt);
+	void stepForward(Character* hero, Casilla* charBloack, Casilla* frontBlock, float dt);
 
 	bool blockCenterReached(Vector3 difference, Vector3 direction);
 
-	void update(float dt);
+	void update(float dt,Hero* hero, Villano* villano);
 private:
 	Vector3 offset;
 	int num_row;

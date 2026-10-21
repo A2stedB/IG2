@@ -18,6 +18,7 @@
 #include <SDL_keycode.h>
 #include "Maze.h"
 #include "Hero.h"
+#include "Villano.h"
 
 
 class IG2Project: public OgreBites::ApplicationContext, OgreBites::InputListener {
@@ -51,6 +52,7 @@ protected:
 
     Maze* mMaze = nullptr;
     Hero* mHero = nullptr;
+    Villano* mVillano = nullptr;
 };
 
 #endif

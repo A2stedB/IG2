@@ -11,10 +11,15 @@ Quaternion IG2Project::getQuaternionForNewDirection() const
 
 void IG2Project::frameRendered(const Ogre::FrameEvent& evt)
 {
-    // Separar la logica en otro lado??
-    if (mHero != nullptr && mMaze != nullptr) {
-		mMaze->moveHero(mHero, evt.timeSinceLastFrame);
-        mMaze->update(evt.timeSinceLastFrame);
+    if (mMaze != nullptr) {
+
+        // Separar la logica en otro lado??
+        if (mHero != nullptr) {
+            mMaze->update(evt.timeSinceLastFrame,mHero,mVillano);
+        }
+        if (mVillano != nullptr)
+            mVillano->update(evt.timeSinceLastFrame);
+
     }
 }
 
@@ -174,8 +179,9 @@ void IG2Project::setupScene(void) {
     mMaze = new Maze(Vector3{0,0,0},mSM->getRootSceneNode()->createChildSceneNode(),mSM,"cube.mesh"/*posicion,scenenode,scenemanager,la malla*/);
     mMaze->createMaze("map.txt");
 
-    mHero = new Hero(mMaze->getHeroStartPosition(), mSM->getRootSceneNode()->createChildSceneNode(), mSM, "Sinbad.mesh");
-
+    mHero = new Hero(mMaze->getHeroStartPosition(), mSM->getRootSceneNode()->createChildSceneNode(), mSM, "Sinbad.mesh",10.0f);
+    mVillano = new Villano(mMaze->getHeroStartPosition(), mSM->getRootSceneNode()->createChildSceneNode(), mSM, 10.0f);
+ 
     // Set position of the dragon
     //mDragonNode->setPosition(x, y, z);
 
