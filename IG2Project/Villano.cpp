@@ -9,11 +9,11 @@ Villano::Villano(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, float
 
 	Ogre::Entity* cuerpo = sceneMng->createEntity("penguin.mesh");
 	cuerpoNode->attachObject(cuerpo);
-	cuerpoNode->setPosition(initialPosition);
+	cuerpoNode->setPosition(Vector3::ZERO);
 
 	Ogre::Entity* cabeza = sceneMng->createEntity("facial.mesh");
 	cabezaNode->attachObject(cabeza);
-	cabezaNode->setPosition(initialPosition+Vector3(0,10,0));
+	cabezaNode->setPosition(Vector3(0, 10, 0));
 
 	pecesNode->setPosition(initialPosition);
 	pecesNode->scale(10, 10, 10);
@@ -25,6 +25,7 @@ Villano::Villano(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, float
 	}
 
 
+	this->setScale(Vector3(0.2f, 0.2f, 0.2f));
 }
 
 // update

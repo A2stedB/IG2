@@ -149,6 +149,9 @@ void Maze::moveCharacter(Character* hero,float dt)
 
 	charBlock = this->getCasillaAtPosition(hero->getPosition());
 
+	if (charBlock == nullptr)
+		return;
+
 	Vector3 blockCenter = charBlock->getPosition() + this->offset;
 
 	inFrontBlock = this->getCasillaAtPosition(blockCenter + (hero->getGridOrientation() * block_size));
@@ -178,9 +181,11 @@ void Maze::moveCharacter(Character* hero,float dt)
 		Casilla* nextBlock = this->getCasillaAtPosition(blockCenter + (hero->getCurrentDirection() * block_size));
 
 		if (nextBlock != nullptr && nextBlock->canPassThrough() && blockCenterReached(difference, hero->getGridOrientation())) {
+			hero->setPosition(blockCenter);
 			hero->rotateToDirection();
 		}
-		else if (hero->is180turn()) {
+		else if (hero->is180turn() && centerReached) {
+			hero->setPosition(blockCenter);
 			hero->rotateToDirection();
 		}
 
