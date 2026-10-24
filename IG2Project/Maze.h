@@ -20,7 +20,7 @@ public:
 
 	void setHeroPosition(Vector3 vector);
 
-	bool can_turn(Vector3 position, Vector3 direction); // Para luego los enemigos
+	bool getAvailableDirection(Vector3 position, Vector3 direction); // Para luego los enemigos
 
 	Vector3 getHeroPosition() const;
 	
@@ -35,6 +35,12 @@ public:
 	bool blockCenterReached(Vector3 difference, Vector3 direction);
 
 	void update(float dt,Hero* hero, Villano* villano);
+
+	//bool is_in_a_intersection(Character* character);
+
+private:
+	bool is_valid_index(int row,int col);
+
 private:
 	Vector3 offset;
 	int num_row;
@@ -42,6 +48,7 @@ private:
 	Vector3 hero_position;
 
 	std::vector<std::vector<Casilla*>> maze;
+	Ogre::SceneNode* floorNode;
 };
 
 // Una clase casilla

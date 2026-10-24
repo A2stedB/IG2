@@ -11,205 +11,260 @@ constexpr const char INVISIBLE = 'i';
 
 const int block_size = 20;
 
-Maze::Maze(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh) : IG2Object(initPos,node,sceneMng)
+Maze::Maze(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh) : IG2Object(initPos, node, sceneMng)
 {
+    floorNode = this->createChildSceneNode();
 }
 
 void Maze::createMaze(std::string stageFileName)
 {
-	ifstream stageFile(stageFileName);
+    ifstream stageFile(stageFileName);
 
-	if (!stageFile)
-		throw 1;
+    if (!stageFile)
+        throw 1;
 
-	stageFile >> num_row;
-	stageFile >> num_column;
+    stageFile >> num_row;
+    stageFile >> num_column;
 
-	maze.resize(num_row);
+    std::string floor_material{};
+    std::string wall_material{};
 
-	this->offset = Vector3(-(num_column * block_size / 2), 0, -(num_row * block_size / 2));
+    stageFile >> floor_material;
 
-	for (int i = 0; i < num_row; ++i) {
+    Ogre::MeshPtr floor_mesh = Ogre::MeshManager::getSingleton().createPlane("floor", /*Nombre de la malla creada*/
+        ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, /*El grupo que pertenece este "recurso"*/
+        Plane(Vector3::UNIT_Y, 0), /*El plano y su normal*/
+        1500, 1500, /*Ancho y alto*/
+        50, 50, /*El numero de segmentos en x e y */
+        true, /*Habilitar la normal normal*/
+        1, /*wtf el numero de las coordenadas de textura*/
+        1, 1, /*Los tiles en el que se divide la malla en x e y*/
+        Vector3::UNIT_Z);
 
-		for (int j = 0; j < num_column; ++j) {
-			char type;
-			stageFile >> type;
+    Ogre::Entity* floorEntity = mSM->createEntity(floor_mesh);
+    floorNode->attachObject(floorEntity);
+    floorEntity->setMaterialName(floor_material);
+    maze.resize(num_row);
 
-			Vector3 pos(j * block_size, 0, i * block_size);
+    this->offset = Vector3(-(num_column * block_size / 2), 0, -(num_row * block_size / 2));
+    floorNode->translate(-offset - Vector3(0, block_size / 2, 0));
 
-			SceneNode* node = this->createChildSceneNode();
+    for (int i = 0; i < num_row; ++i)
+    {
 
-			Casilla* bloque;
+        for (int j = 0; j < num_column; ++j)
+        {
+            char type;
+            stageFile >> type;
 
-			switch (type) {
-			    case HERO:
-					hero_position = pos;
-					bloque = new Hueco(pos, node, mSM);
-					break;
-				case MURO:
-					bloque = new Muro(pos, node, mSM, "cube.mesh");
-					node->showBoundingBox(true);
-					break;
-				case HUECO:
-					bloque = new Hueco(pos, node, mSM);
-					break;
-				case INVISIBLE:
-					bloque = new BloqueInvisible(pos, node, mSM, "cube.mesh");
-					break;
-				case FAKE:
-					bloque = new BloqueFalso(pos, node, mSM, "cube.mesh");
-					break;
-				default:
-					throw 1;
-			}
+            Vector3 pos(j * block_size, 0, i * block_size);
 
-			//redimensionar escalando
-			Vector3 size = bloque->calculateBoxSize();
-			float propX, propY, propZ;
+            SceneNode* node = this->createChildSceneNode();
 
-			propX = block_size / size.x;
-			propY = block_size / size.y;
-			propZ = block_size / size.z;
+            Casilla* bloque;
 
-			bloque->setScale(Vector3(propX, propY, propZ));
+            switch (type)
+            {
+            case HERO:
+                hero_position = pos;
+                bloque = new Hueco(pos, node, mSM);
+                break;
+            case MURO:
+                bloque = new Muro(pos, node, mSM, "cube.mesh");
+                node->showBoundingBox(true);
+                break;
+            case HUECO:
+                bloque = new Hueco(pos, node, mSM);
+                break;
+            case INVISIBLE:
+                bloque = new BloqueInvisible(pos, node, mSM, "cube.mesh");
+                break;
+            case FAKE:
+                bloque = new BloqueFalso(pos, node, mSM, "cube.mesh");
+                break;
+            default:
+                throw 1;
+            }
 
-			maze[i].push_back(bloque);
-			
-		}
-	 }
-	// colocarlo en el centro
-	this->setPosition(this->offset);
+            //redimensionar escalando
+            Vector3 size = bloque->calculateBoxSize();
+            float propX, propY, propZ;
 
-	stageFile.close();
+            propX = block_size / size.x;
+            propY = block_size / size.y;
+            propZ = block_size / size.z;
+
+            bloque->setScale(Vector3(propX, propY, propZ));
+
+            maze[i].push_back(bloque);
+
+        }
+    }
+    // colocarlo en el centro
+    this->setPosition(this->offset);
+
+    stageFile.close();
 };
 
 Vector3 Maze::getHeroStartPosition() const
 {
-	return hero_position + this->offset; // *El heroe tiene posicion global*
+    return hero_position + this->offset; // *El heroe tiene posicion global*
 }
 
 void Maze::setHeroPosition(Vector3 vector)
 {
-	hero_position = vector - this->offset; // Relativo al nodo del laberinto
-	//std::cout << hero_position << std::endl;
-	//std::cout << "Vector: " << vector << std::endl;
-}
-
-bool Maze::can_turn(Vector3 position, Vector3 direction)
-{
-	
-	return false;
+    hero_position = vector - this->offset; // Relativo al nodo del laberinto
+    //std::cout << hero_position << std::endl;
+    //std::cout << "Vector: " << vector << std::endl;
 }
 
 Vector3 Maze::getHeroPosition() const
 {
-	return hero_position;
+    return hero_position;
 }
 
-void Maze::stepForward(Character* hero, Casilla* charBlock, Casilla* frontBlock, float dt) {
-	if (frontBlock != nullptr && charBlock != nullptr && frontBlock->canPassThrough()) {
+void Maze::stepForward(Character* hero, Casilla* charBlock, Casilla* frontBlock, float dt)
+{
+    if (frontBlock != nullptr && charBlock != nullptr && frontBlock->canPassThrough())
+    {
 
-		hero->move(hero->getGridOrientation() * hero->getSpeed() * dt);
-	}
+        hero->move(hero->getGridOrientation() * hero->getSpeed() * dt);
+    }
 }
 
-bool Maze::blockCenterReached(Vector3 difference, Vector3 direction) {
-	if (direction == Vector3::UNIT_X || direction == Vector3::NEGATIVE_UNIT_X) {
-		return abs(difference.x) < 0.5f;
-	}
-	else if (direction == Vector3::UNIT_Z || direction == Vector3::NEGATIVE_UNIT_Z) {
-		return abs(difference.z) < 0.5f;
-	}
-	else {
-		return false;
-	}
+bool Maze::blockCenterReached(Vector3 difference, Vector3 direction)
+{
+    if (direction == Vector3::UNIT_X || direction == Vector3::NEGATIVE_UNIT_X)
+    {
+        return abs(difference.x) < 0.5f;
+    }
+    else if (direction == Vector3::UNIT_Z || direction == Vector3::NEGATIVE_UNIT_Z)
+    {
+        return abs(difference.z) < 0.5f;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 Casilla* Maze::getCasillaAtPosition(Vector3 position)
 {
-	Vector3 localPos = position - offset;
+    Vector3 localPos = position - offset;
 
-	int row = std::round(localPos.z / block_size);
+    int row = std::round(localPos.z / block_size);
 
-	int col = std::round(localPos.x / block_size);
+    int col = std::round(localPos.x / block_size);
 
-	if (row < 0 || row >= num_row || col < 0 || col >= num_column)
-	{
-		return nullptr;
-	}
+    if (row < 0 || row >= num_row || col < 0 || col >= num_column)
+    {
+        return nullptr;
+    }
 
-	return maze[row][col];
+    return maze[row][col];
 }
 
 
-void Maze::moveCharacter(Character* hero,float dt)
+void Maze::moveCharacter(Character* character, float dt)
 {
-	Casilla* charBlock;
-	Casilla* inFrontBlock;
+    Casilla* charBlock;
+    Casilla* inFrontBlock;
 
-	charBlock = this->getCasillaAtPosition(hero->getPosition());
+    charBlock = this->getCasillaAtPosition(character->getPosition());
 
-	if (charBlock == nullptr)
-		return;
+    if (charBlock == nullptr)
+        return;
 
-	Vector3 blockCenter = charBlock->getPosition() + this->offset;
+    Vector3 blockCenter = charBlock->getPosition() + this->offset;
 
-	inFrontBlock = this->getCasillaAtPosition(blockCenter + (hero->getGridOrientation() * block_size));
+    inFrontBlock = this->getCasillaAtPosition(blockCenter + (character->getGridOrientation() * block_size));
 
-	Vector3 localPos = hero->getPosition() - this->offset;
+    Vector3 localPos = character->getPosition() - this->offset;
 
-	Vector3 newPos = localPos + (hero->getGridOrientation() * hero->getSpeed() * dt);
+    Vector3 newPos = localPos + (character->getGridOrientation() * character->getSpeed() * dt);
 
+    Vector3 difference = Vector3(newPos.x - charBlock->getPosition().x, 0, newPos.z - charBlock->getPosition().z);
 
-	Vector3 difference = Vector3(newPos.x - charBlock->getPosition().x, 0, newPos.z - charBlock->getPosition().z);
+    bool centerReached = blockCenterReached(difference, character->getGridOrientation());
 
-	bool centerReached = blockCenterReached(difference, hero->getGridOrientation());
+    if (!character->getDirectionModified())
+    {
 
-	if (!hero->getDirectionModified()) {
+        if (centerReached)
+        {
+            stepForward(character, charBlock, inFrontBlock, dt);
+        }
+        else
+        { // si no ha llegado el centro de la casilla actual, mueve hasta el centro
+            character->move(character->getGridOrientation() * character->getSpeed() * dt);
+        }
 
-		if (centerReached) {
-			stepForward(hero, charBlock, inFrontBlock, dt);
-		}
-		else { // si no ha llegado el centro de la casilla actual, mueve hasta el centro
-			hero->move(hero->getGridOrientation() * hero->getSpeed() * dt);
-		}
+    }
 
-	}
+    else
+    {
 
-	else {
+        Casilla* nextBlock = this->getCasillaAtPosition(blockCenter + (character->getCurrentDirection() * block_size));
 
-		Casilla* nextBlock = this->getCasillaAtPosition(blockCenter + (hero->getCurrentDirection() * block_size));
+        if (nextBlock != nullptr && nextBlock->canPassThrough() && blockCenterReached(difference, character->getGridOrientation()))
+        {
+            character->setPosition(blockCenter);
+            character->rotateToDirection();
+        }
+        else if (character->is180turn() && centerReached)
+        {
+            character->setPosition(blockCenter);
+            character->rotateToDirection();
+        }
 
-		if (nextBlock != nullptr && nextBlock->canPassThrough() && blockCenterReached(difference, hero->getGridOrientation())) {
-			hero->setPosition(blockCenter);
-			hero->rotateToDirection();
-		}
-		else if (hero->is180turn() && centerReached) {
-			hero->setPosition(blockCenter);
-			hero->rotateToDirection();
-		}
-
-		else {
-			if (centerReached) {
-				stepForward(hero, charBlock, inFrontBlock, dt);
-			}
-			else {
-				hero->move(hero->getGridOrientation() * hero->getSpeed() * dt);
-			}
-		}
-	}
+        else
+        {
+            if (centerReached)
+            {
+                stepForward(character, charBlock, inFrontBlock, dt);
+            }
+            else
+            {
+                character->move(character->getGridOrientation() * character->getSpeed() * dt);
+            }
+        }
+    }
 }
 
-void Maze::update(float dt, Hero* hero, Villano *villano) 
+void Maze::update(float dt, Hero* hero, Villano* villano)
 {
-	moveCharacter(hero,dt);
-	moveCharacter(villano,dt);
+    moveCharacter(hero, dt);
+    moveCharacter(villano, dt);
 
-	for (int i = 0; i < num_row; ++i) 
-	{
-		for (int j = 0; j < num_column; ++j) {
-			maze[i][j]->update(dt);
-		}
-	}
+    for (int i = 0; i < num_row; ++i)
+    {
+        for (int j = 0; j < num_column; ++j)
+        {
+            maze[i][j]->update(dt);
+        }
+    }
+}
+
+//bool Maze::is_in_a_intersection(Character* character)
+//{
+//	Casilla* charBlock;
+//	Casilla* inFrontBlock;
+//
+//	charBlock = this->getCasillaAtPosition(character->getPosition());
+//
+//	Vector3 localPos = character->getPosition() - offset;
+//
+//	int row = std::round(localPos.z / block_size);
+//
+//	int col = std::round(localPos.x / block_size);
+//
+//	Vector3 orientation = character->getGridOrientation();
+//
+//	return false;
+//}
+
+bool Maze::is_valid_index(int row, int col)
+{
+    return row < 0 || row >= num_row || col < 0 || col >= num_column;
 }
 

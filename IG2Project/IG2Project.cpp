@@ -19,7 +19,6 @@ void IG2Project::frameRendered(const Ogre::FrameEvent& evt)
         }
         if (mVillano != nullptr)
             mVillano->update(evt.timeSinceLastFrame);
-
     }
 }
 
