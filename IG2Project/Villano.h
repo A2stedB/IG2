@@ -1,6 +1,7 @@
 #pragma once
 #include "Character.h"
 #include <OgreTimer.h>
+#include "Animation.h"
 class Villano : public Character
 {
 public:
@@ -15,10 +16,12 @@ private:
 	Ogre::Timer directionTimer;
 	Ogre::Timer pecesNodeTimer;
 
-	Ogre::AnimationState* pecesNodeAnimationState;
-	Ogre::Animation* pecesNodeAnimation;
-	Ogre::NodeAnimationTrack* pecesNodeAnimationTrack;
+	//Ogre::AnimationState* pecesNodeAnimationState;
+	//Ogre::Animation* pecesNodeAnimation;
+	//Ogre::NodeAnimationTrack* pecesNodeAnimationTrack;
 
-	std::vector<Ogre::TransformKeyFrame*> keyframes;
+	//std::vector<Ogre::TransformKeyFrame*> keyframes;
+
+	NodeAnimation pecesNodeAnimation;
 };
 

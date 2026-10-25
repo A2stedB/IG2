@@ -28,8 +28,13 @@ void Maze::createMaze(std::string stageFileName)
 
     std::string floor_material{};
     std::string wall_material{};
+    std::string light_type;
 
-    stageFile >> floor_material;
+    stageFile >> floor_material >> wall_material/*>> light_type*/;
+
+    //mHeroSpotLightNode = mSM->getRootSceneNode()->createChildSceneNode("HeroLight");
+    //Light* luz = mSM->createLight("HeroLight");
+    //luz->setType(Ogre::Light::LT_SPOTLIGHT);
 
     Ogre::MeshPtr floor_mesh = Ogre::MeshManager::getSingleton().createPlane("floor", /*Nombre de la malla creada*/
         ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, /*El grupo que pertenece este "recurso"*/
@@ -97,6 +102,11 @@ void Maze::createMaze(std::string stageFileName)
             bloque->setScale(Vector3(propX, propY, propZ));
 
             maze[i].push_back(bloque);
+
+            if (type != HUECO && type != HERO)
+            {
+                bloque->setMaterialName(wall_material);
+            }
 
         }
     }

@@ -49,6 +49,8 @@ private:
 
 	std::vector<std::vector<Casilla*>> maze;
 	Ogre::SceneNode* floorNode;
+
+	Ogre::SceneNode* mHeroSpotLightNode = nullptr;
 };
 
 // Una clase casilla

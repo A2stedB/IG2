@@ -37,6 +37,7 @@
     <ClCompile Include="Villano.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Animation.h" />
     <ClInclude Include="Casilla.h" />
     <ClInclude Include="Character.h" />
     <ClInclude Include="Hero.h" />

@@ -40,29 +40,32 @@ Villano::Villano(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, float
 
 	pecesNode->setInitialState();
 
-	pecesNodeAnimation = mSM->createAnimation("peces_animation_1",4);
-	pecesNodeAnimation->setInterpolationMode(Ogre::Animation::IM_SPLINE);
-	pecesNodeAnimationTrack = pecesNodeAnimation->createNodeTrack(0);
-	pecesNodeAnimationTrack->setAssociatedNode(pecesNode);
+	pecesNodeAnimation = NodeAnimation();
+
+	pecesNodeAnimation.animation= mSM->createAnimation("peces_animation_1",4);
+	pecesNodeAnimation.animation->setInterpolationMode(Ogre::Animation::IM_SPLINE);
+	pecesNodeAnimation.track = pecesNodeAnimation.animation->createNodeTrack(0);
+	pecesNodeAnimation.track->setAssociatedNode(pecesNode);
 
 
 	
-	keyframes.push_back(pecesNodeAnimationTrack->createNodeKeyFrame(0));
-	keyframes.push_back(pecesNodeAnimationTrack->createNodeKeyFrame(1));
-	keyframes.push_back(pecesNodeAnimationTrack->createNodeKeyFrame(2));
-	keyframes.push_back(pecesNodeAnimationTrack->createNodeKeyFrame(3));
-	keyframes.push_back(pecesNodeAnimationTrack->createNodeKeyFrame(4));
+	pecesNodeAnimation.keyframes.push_back(pecesNodeAnimation.track->createNodeKeyFrame(0));
+	pecesNodeAnimation.keyframes.push_back(pecesNodeAnimation.track->createNodeKeyFrame(1));
+	pecesNodeAnimation.keyframes.push_back(pecesNodeAnimation.track->createNodeKeyFrame(2));
+	pecesNodeAnimation.keyframes.push_back(pecesNodeAnimation.track->createNodeKeyFrame(3));
+	pecesNodeAnimation.keyframes.push_back(pecesNodeAnimation.track->createNodeKeyFrame(4));
 
-	keyframes[0]->setRotation(Quaternion());
+	auto& keyframes = pecesNodeAnimation.keyframes;
+	keyframes[0]->setRotation(Quaternion(Ogre::Radian(90),Vector3(0,1,0)));
 	keyframes[1]->setRotation(Quaternion(Ogre::Radian(90),Vector3(0,1,0)));
 	keyframes[2]->setRotation(Quaternion(Ogre::Radian(180),Vector3(0,1,0)));
 	keyframes[3]->setRotation(Quaternion(Ogre::Radian(270),Vector3(0,1,0)));
-	keyframes[4]->setRotation(Quaternion());
+	keyframes[4]->setRotation(Quaternion(Ogre::Radian(90), Vector3(0, 1, 0)));
 
-	pecesNodeAnimationState = mSM->createAnimationState("peces_animation_1");
+	pecesNodeAnimation.state = mSM->createAnimationState("peces_animation_1");
 
-	pecesNodeAnimationState->setLoop(true);
-	pecesNodeAnimationState->setEnabled(true);
+	pecesNodeAnimation.state->setLoop(true);
+	pecesNodeAnimation.state->setEnabled(true);
 
 
 	//for (int i = 0;i < 8;++i) {
@@ -83,7 +86,7 @@ Villano::Villano(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, float
 void Villano::update(float dt) 
 {
 	//std::cout << getGridOrientation() << "\n";
-	pecesNodeAnimationState->addTime(dt);
+	pecesNodeAnimation.state->addTime(dt);
 	if (directionTimer.getMilliseconds() < UPDATE_TIME) return;
 	int rnd = rand() % 4;
 

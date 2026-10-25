@@ -28,6 +28,8 @@ public:
     virtual ~IG2Project() {};
 
     Quaternion getQuaternionForNewDirection() const;
+
+    void showCurrentInfo();
 protected:
     virtual void frameRendered(const Ogre::FrameEvent& evt);
     virtual bool keyPressed(const OgreBites::KeyboardEvent& evt);
@@ -53,6 +55,10 @@ protected:
     Maze* mMaze = nullptr;
     Hero* mHero = nullptr;
     Villano* mVillano = nullptr;
+
+    OgreBites::TextBox* mTextbox;
+    Ogre::SceneNode* mHeroSpotLightNode = nullptr;
+
 };
 
 #endif

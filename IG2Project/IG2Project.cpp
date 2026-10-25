@@ -1,5 +1,6 @@
 ﻿#include "IG2Project.h"
 #include "Maze.h"
+#include <OgreTrays.h>
 using namespace std;
 using namespace Ogre;
 
@@ -7,6 +8,17 @@ using namespace Ogre;
 Quaternion IG2Project::getQuaternionForNewDirection() const
 {
     return Quaternion(mHero->getCurrentDirection().getRotationTo(nextDir));
+}
+
+void IG2Project::showCurrentInfo()
+{
+    std::stringstream ss;
+    // Caption
+    // Game status
+    ss.str(std::string());
+    ss << "Lives: " << mHero->getLives() << endl;
+    ss << "Points: " << mHero->getPoints() << endl;
+    mTextbox->setText(ss.str());
 }
 
 void IG2Project::frameRendered(const Ogre::FrameEvent& evt)
@@ -19,6 +31,11 @@ void IG2Project::frameRendered(const Ogre::FrameEvent& evt)
         }
         if (mVillano != nullptr)
             mVillano->update(evt.timeSinceLastFrame);
+    }
+
+    if (mTextbox != nullptr)
+    {
+        showCurrentInfo();
     }
 }
 
@@ -131,6 +148,10 @@ void IG2Project::setupScene(void) {
     mLightNode->setDirection(Ogre::Vector3(-1, -1, -1));
  
 
+    //mHeroSpotLightNode = mSM->getRootSceneNode()->createChildSceneNode("HeroLight");
+    //luz = mSM->createLight("HeroLight");
+    //luz->setType(Ogre::Light::LT_SPOTLIGHT);
+
     //------------------------------------------------------------------------
     // Creating Sinbad
 
@@ -180,6 +201,11 @@ void IG2Project::setupScene(void) {
 
     mHero = new Hero(mMaze->getHeroStartPosition(), mSM->getRootSceneNode()->createChildSceneNode(), mSM, "Sinbad.mesh",10.0f);
     mVillano = new Villano(mMaze->getHeroStartPosition(), mSM->getRootSceneNode()->createChildSceneNode(), mSM, 10.0f);
+
+    mTrayMgr->createLabel(OgreBites::TL_BOTTOMRIGHT, "Text_Informacion","Informacion",30);
+    mTextbox = mTrayMgr->createTextBox(OgreBites::TL_BOTTOMRIGHT, "TextBox_Vida", "", 200, 100);
+    mTextbox->setText("Vida: \nPuntos: ");
+    mTextbox->setScrollPercentage(0);
  
     // Set position of the dragon
     //mDragonNode->setPosition(x, y, z);

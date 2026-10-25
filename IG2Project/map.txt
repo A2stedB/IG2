@@ -1,6 +1,7 @@
 19
 19
 spaceskyFloor
+stoneWall
 xxxxxxxxxxxxxxxxxxx
 xhoooooooxoooooooox
 xoffoxxxoxoxxxoxxox
