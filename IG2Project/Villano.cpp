@@ -56,17 +56,47 @@ Villano::Villano(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, float
 	pecesNodeAnimation.keyframes.push_back(pecesNodeAnimation.track->createNodeKeyFrame(4));
 
 	auto& keyframes = pecesNodeAnimation.keyframes;
-	keyframes[0]->setRotation(Quaternion(Ogre::Radian(90),Vector3(0,1,0)));
-	keyframes[1]->setRotation(Quaternion(Ogre::Radian(90),Vector3(0,1,0)));
-	keyframes[2]->setRotation(Quaternion(Ogre::Radian(180),Vector3(0,1,0)));
-	keyframes[3]->setRotation(Quaternion(Ogre::Radian(270),Vector3(0,1,0)));
-	keyframes[4]->setRotation(Quaternion(Ogre::Radian(90), Vector3(0, 1, 0)));
+	keyframes[0]->setRotation(Quaternion(Ogre::Degree(90),Vector3(0,1,0)));
+	keyframes[1]->setRotation(Quaternion(Ogre::Degree(90),Vector3(0,1,0)));
+	keyframes[2]->setRotation(Quaternion(Ogre::Degree(180),Vector3(0,1,0)));
+	keyframes[3]->setRotation(Quaternion(Ogre::Degree(270),Vector3(0,1,0)));
+	keyframes[4]->setRotation(Quaternion(Ogre::Degree(90), Vector3(0, 1, 0)));
 
 	pecesNodeAnimation.state = mSM->createAnimationState("peces_animation_1");
 
 	pecesNodeAnimation.state->setLoop(true);
 	pecesNodeAnimation.state->setEnabled(true);
 
+	
+	// crear animacion cabeza
+	cabezaNode->setInitialState();
+
+	cabezaNodeAnimation = NodeAnimation();
+
+	cabezaNodeAnimation.animation = mSM->createAnimation("cabeza_animation_1", 4);
+	cabezaNodeAnimation.animation->setInterpolationMode(Ogre::Animation::IM_SPLINE);
+
+	cabezaNodeAnimation.track = cabezaNodeAnimation.animation->createNodeTrack(0);
+	cabezaNodeAnimation.track->setAssociatedNode(cabezaNode);
+
+	cabezaNodeAnimation.keyframes.push_back(cabezaNodeAnimation.track->createNodeKeyFrame(0));
+	cabezaNodeAnimation.keyframes.push_back(cabezaNodeAnimation.track->createNodeKeyFrame(1));
+	cabezaNodeAnimation.keyframes.push_back(cabezaNodeAnimation.track->createNodeKeyFrame(2));
+	cabezaNodeAnimation.keyframes.push_back(cabezaNodeAnimation.track->createNodeKeyFrame(3));
+	cabezaNodeAnimation.keyframes.push_back(cabezaNodeAnimation.track->createNodeKeyFrame(4));
+
+	auto& keyframesCabeza = cabezaNodeAnimation.keyframes;
+
+	keyframesCabeza[0]->setRotation(Quaternion(Ogre::Degree(0), Vector3::UNIT_Y));
+	keyframesCabeza[1]->setRotation(Quaternion(Ogre::Degree(-90), Vector3::UNIT_Y));
+	keyframesCabeza[2]->setRotation(Quaternion(Ogre::Degree(-180), Vector3::UNIT_Y));
+	keyframesCabeza[3]->setRotation(Quaternion(Ogre::Degree(-270), Vector3::UNIT_Y));
+	keyframesCabeza[4]->setRotation(Quaternion(Ogre::Degree(-360), Vector3::UNIT_Y));
+
+	cabezaNodeAnimation.state = mSM->createAnimationState("cabeza_animation_1");
+
+	cabezaNodeAnimation.state->setLoop(true);
+	cabezaNodeAnimation.state->setEnabled(true);
 
 	//for (int i = 0;i < 8;++i) {
 	//	Ogre::SceneNode* nodo = pecesNode->createChildSceneNode();
@@ -87,6 +117,8 @@ void Villano::update(float dt)
 {
 	//std::cout << getGridOrientation() << "\n";
 	pecesNodeAnimation.state->addTime(dt);
+	cabezaNodeAnimation.state->addTime(dt);
+
 	if (directionTimer.getMilliseconds() < UPDATE_TIME) return;
 	int rnd = rand() % 4;
 

@@ -23,5 +23,6 @@ private:
 	//std::vector<Ogre::TransformKeyFrame*> keyframes;
 
 	NodeAnimation pecesNodeAnimation;
+	NodeAnimation cabezaNodeAnimation;
 };
 
