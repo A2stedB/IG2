@@ -146,55 +146,6 @@ void IG2Project::setupScene(void) {
     //mLightNode = mSM->getRootSceneNode()->createChildSceneNode("nLuz");
     //mLightNode->attachObject(luz);
     //mLightNode->setDirection(Ogre::Vector3(-1, -1, -1));
- 
-
-    //mHeroSpotLightNode = mSM->getRootSceneNode()->createChildSceneNode("HeroLight");
-    //luz = mSM->createLight("HeroLight");
-    //luz->setType(Ogre::Light::LT_SPOTLIGHT);
-
-    //------------------------------------------------------------------------
-    // Creating Sinbad
-
-    //Ogre::Entity* ent = mSM->createEntity("Sinbad.mesh");
-    //mSinbadNode = mSM->getRootSceneNode()->createChildSceneNode("nSinbad");
-    //mSinbadNode->attachObject(ent);
-
-    // Show bounding box
-    //mSinbadNode->showBoundingBox(true);
-
-    // Set position of Sinbad
-    //mSinbadNode->setPosition(x, y, z);
-
-    // Set scale of Sinbad
-    //mSinbadNode->setScale(20, 20, 20);
-
-    //mSinbadNode->yaw(Ogre::Degree(-45));
-    //mSinbadNode->setVisible(false);    
-
-
-    //------------------------------------------------------------------------
-    // Creating the floor
-
-    //MeshManager::getSingleton().createPlane("floor", ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-    //    Plane(Vector3::UNIT_Y, 0),
-    //    1500, 1500, 50, 50, true, 1, 5, 5,
-    //    Vector3::UNIT_Z);
-
-    //Entity* entFloor = mSM->createEntity("exampleFloor", "floor");
-    //entFloor->setMaterialName("example/stonesFloor");
-    //SceneNode* floorNode = mSM->getRootSceneNode()->createChildSceneNode();
-    //floorNode->attachObject(entFloor);
-
-
-    //------------------------------------------------------------------------
-   // Creating the dragon
-
-    //Ogre::Entity* entDragon = mSM->createEntity("dragon.mesh");
-    //Ogre::SceneNode* mDragonNode = mSM->getRootSceneNode()->createChildSceneNode("nDragon");
-    //mDragonNode->attachObject(entDragon);
-
-    //// Show bounding box
-    //mDragonNode->showBoundingBox(true);
 
     mMaze = new Maze(Vector3{0,0,0},mSM->getRootSceneNode()->createChildSceneNode(),mSM,"cube.mesh"/*posicion,scenenode,scenemanager,la malla*/);
     mMaze->createMaze("map.txt");
@@ -202,8 +153,13 @@ void IG2Project::setupScene(void) {
     mHero = new Hero(mMaze->getHeroStartPosition(), mSM->getRootSceneNode()->createChildSceneNode(), mSM, "Sinbad.mesh",10.0f);
     mVillano = new Villano(mMaze->getHeroStartPosition(), mSM->getRootSceneNode()->createChildSceneNode(), mSM, 10.0f);
 
+
+    vp = getRenderWindow()->getViewport(0);
+    vp->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
+
     Light* luz = mSM->createLight("Luz");
     Ogre::Light::LightTypes heroLightType = mMaze->getHeroLightType();
+    luz->setType(heroLightType);
 
     if (heroLightType == Ogre::Light::LT_DIRECTIONAL) {
         mHeroLightNode = mSM->getRootSceneNode()->createChildSceneNode("node_luz");
@@ -215,13 +171,16 @@ void IG2Project::setupScene(void) {
         mHeroLightNode->attachObject(luz);
 
         if (heroLightType == Ogre::Light::LT_POINT) {
-            luz->setAttenuation(500, 1, 0.01f, 0.0005f);
+            luz->setAttenuation(500, 1, 0.0001f, 0.0001f);
+            luz->setDiffuseColour(1, 1, 1);
             mHeroLightNode->setPosition(Vector3(0,30,0));
         }
-        else if (heroLightType == Ogre::Light::LT_SPOTLIGHT) {
+        else if (heroLightType == Ogre::Light::LT_SPOTLIGHT) 
+        {
             mHeroLightNode->setDirection(Vector3(0,-1,0));
-            luz->setSpotlightRange(Degree(25.0f),Degree(45.0f));
-            mHeroLightNode->setPosition(Vector3(0, 30, 0));
+            luz->setSpotlightRange(Degree(45.0f),Degree(90.0f),2);
+            luz->setDiffuseColour(1,1,1);
+            mHeroLightNode->setPosition(Vector3(0, 60, 0));
         }
         else throw 1;
     }
@@ -231,13 +190,4 @@ void IG2Project::setupScene(void) {
     mTextbox = mTrayMgr->createTextBox(OgreBites::TL_BOTTOMRIGHT, "TextBox_Vida", "", 200, 100);
     mTextbox->setText("Vida: \nPuntos: ");
     mTextbox->setScrollPercentage(0);
- 
-    // Set position of the dragon
-    //mDragonNode->setPosition(x, y, z);
-
-    // Set scale of the dragon
-    //mDragonNode->setScale(20, 20, 20);
-
-    //mDragonNode->yaw(Ogre::Degree(-45));
-    //mDragonNode->setVisible(false);
 }
