@@ -59,6 +59,7 @@ protected:
     OgreBites::TextBox* mTextbox;
     Ogre::SceneNode* mHeroLightNode = nullptr;
 
+    float collisionCooldown = 0.0f;
 };
 
 #endif

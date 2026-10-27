@@ -9,16 +9,16 @@ public:
 	
 	inline int getLives() const
 	{
-		return live;
+		return lives;
 	}
 
 	inline int getPoints() const
 	{
 		return points;
 	}
-
+	void loseLife();
 private:
-	int live{ 0 };
+	int lives = 3;
 	int points{ 0 };
 };
 

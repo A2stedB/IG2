@@ -23,7 +23,8 @@ public:
 	bool getAvailableDirection(Vector3 position, Vector3 direction); // Para luego los enemigos
 
 	Vector3 getHeroPosition() const;
-	
+	Vector3 getVillanoStartPosition() const;
+
 	bool is_intersection() const;
 
 	Casilla* getCasillaAtPosition(Vector3 position);
@@ -51,7 +52,7 @@ private:
 	int num_row;
 	int num_column;
 	Vector3 hero_position;
-
+	Vector3 villano_position;
 	std::vector<std::vector<Casilla*>> maze;
 	Ogre::SceneNode* floorNode;
 

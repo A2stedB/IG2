@@ -6,3 +6,8 @@ Hero::Hero(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh
 {
 }
 
+void Hero::loseLife()
+{
+	if (lives > 0)
+		lives--;
+}

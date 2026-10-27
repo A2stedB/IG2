@@ -23,14 +23,38 @@ void IG2Project::showCurrentInfo()
 
 void IG2Project::frameRendered(const Ogre::FrameEvent& evt)
 {
+    if (collisionCooldown > 0)
+        collisionCooldown -= evt.timeSinceLastFrame;
+
     if (mMaze != nullptr) {
 
-        // Separar la logica en otro lado??
-        if (mHero != nullptr) {
-            mMaze->update(evt.timeSinceLastFrame,mHero,mVillano);
-        }
-        if (mVillano != nullptr)
+        if (mHero != nullptr && mVillano != nullptr) {
+
+            mMaze->update(evt.timeSinceLastFrame, mHero, mVillano);
+
             mVillano->update(evt.timeSinceLastFrame);
+
+            // Colision entre heroe y villano
+            if (collisionCooldown <= 0 &&
+                mHero->getAABB().intersects(mVillano->getAABB())) {
+
+                mHero->loseLife();
+
+                if (mHero->getLives() > 0) {
+
+                    // Volver al inicio del laberinto
+                    mHero->setPosition(mMaze->getHeroStartPosition());
+
+                    collisionCooldown = 1.0f;
+                }
+                else {
+
+                    // Fin del juego
+                    getRoot()->queueEndRendering();
+                    return;
+                }
+            }
+        }
     }
 
     if (mTextbox != nullptr)
@@ -151,7 +175,7 @@ void IG2Project::setupScene(void) {
     mMaze->createMaze("map.txt");
 
     mHero = new Hero(mMaze->getHeroStartPosition(), mSM->getRootSceneNode()->createChildSceneNode(), mSM, "Sinbad.mesh",10.0f);
-    mVillano = new Villano(mMaze->getHeroStartPosition(), mSM->getRootSceneNode()->createChildSceneNode(), mSM, 10.0f);
+    mVillano = new Villano(mMaze->getVillanoStartPosition(), mSM->getRootSceneNode()->createChildSceneNode(), mSM, 10.0f);
 
 
     vp = getRenderWindow()->getViewport(0);

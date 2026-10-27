@@ -8,6 +8,7 @@ constexpr const char HUECO = 'o';
 constexpr const char HERO = 'h';
 constexpr const char FAKE = 'f';
 constexpr const char INVISIBLE = 'i';
+constexpr const char VILLANO = 'v';
 
 const int block_size = 20;
 
@@ -98,6 +99,10 @@ void Maze::createMaze(std::string stageFileName)
             case FAKE:
                 bloque = new BloqueFalso(pos, node, mSM, "cube.mesh");
                 break;
+            case VILLANO:
+                villano_position = pos;
+                bloque = new Hueco(pos, node, mSM);
+                break;
             default:
                 throw 1;
             }
@@ -114,7 +119,7 @@ void Maze::createMaze(std::string stageFileName)
 
             maze[i].push_back(bloque);
 
-            if (type != HUECO && type != HERO)
+            if (type != HUECO && type != HERO && type != VILLANO)
             {
                 bloque->setMaterialName(wall_material);
             }
@@ -130,6 +135,11 @@ void Maze::createMaze(std::string stageFileName)
 Vector3 Maze::getHeroStartPosition() const
 {
     return hero_position + this->offset; // *El heroe tiene posicion global*
+}
+
+Vector3 Maze::getVillanoStartPosition() const
+{
+    return villano_position + this->offset;
 }
 
 void Maze::setHeroPosition(Vector3 vector)
