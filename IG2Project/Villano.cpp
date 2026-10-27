@@ -18,9 +18,28 @@ Villano::Villano(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, float
 	cuerpoNode->attachObject(cuerpo);
 	cuerpoNode->setPosition(Vector3::ZERO);
 
-	Ogre::Entity* cabeza = sceneMng->createEntity("facial.mesh");
-	cabezaNode->attachObject(cabeza);
-	cabezaNode->setPosition(Vector3(0, 10, 0));
+	// crear 3 cabezas
+
+	SceneNode* cabezas[3];
+
+	Vector3 posiciones[3] = {
+		Vector3(0, 10, 0),    // Cabeza medio
+		Vector3(-10, 10, 0),    // Cabeza izquierdo
+		Vector3(10, 10, 0)      // Cabeza derecho
+	};
+
+	for (int i = 0; i < 3; ++i) {
+
+		cabezas[i] = cabezaNode->createChildSceneNode();
+
+		Ogre::Entity* cabeza = sceneMng->createEntity("facial.mesh");
+		cabezas[i]->attachObject(cabeza);
+
+		cabezas[i]->setPosition(posiciones[i]);
+		cabezas[i]->setScale(Vector3(0.7f, 0.7f, 0.7f));
+
+		cabezas[i]->setInitialState();
+	}
 
 	//pecesNode->setPosition(initialPosition);
 	pecesNode->scale(10, 10, 10);
@@ -69,31 +88,36 @@ Villano::Villano(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, float
 
 	
 	// crear animacion cabeza
-	cabezaNode->setInitialState();
-
 	cabezaNodeAnimation = NodeAnimation();
 
-	cabezaNodeAnimation.animation = mSM->createAnimation("cabeza_animation_1", 4);
-	cabezaNodeAnimation.animation->setInterpolationMode(Ogre::Animation::IM_SPLINE);
+	cabezaNodeAnimation.animation = mSM->createAnimation("cabezas_animation", 4);
+	cabezaNodeAnimation.animation->setInterpolationMode(Ogre::Animation::IM_LINEAR);
 
-	cabezaNodeAnimation.track = cabezaNodeAnimation.animation->createNodeTrack(0);
-	cabezaNodeAnimation.track->setAssociatedNode(cabezaNode);
+	for (int i = 0; i < 3; ++i) {
 
-	cabezaNodeAnimation.keyframes.push_back(cabezaNodeAnimation.track->createNodeKeyFrame(0));
-	cabezaNodeAnimation.keyframes.push_back(cabezaNodeAnimation.track->createNodeKeyFrame(1));
-	cabezaNodeAnimation.keyframes.push_back(cabezaNodeAnimation.track->createNodeKeyFrame(2));
-	cabezaNodeAnimation.keyframes.push_back(cabezaNodeAnimation.track->createNodeKeyFrame(3));
-	cabezaNodeAnimation.keyframes.push_back(cabezaNodeAnimation.track->createNodeKeyFrame(4));
+		Ogre::NodeAnimationTrack* track =
+			cabezaNodeAnimation.animation->createNodeTrack(i);
 
-	auto& keyframesCabeza = cabezaNodeAnimation.keyframes;
+		track->setAssociatedNode(cabezas[i]);
 
-	keyframesCabeza[0]->setRotation(Quaternion(Ogre::Degree(0), Vector3::UNIT_Y));
-	keyframesCabeza[1]->setRotation(Quaternion(Ogre::Degree(-90), Vector3::UNIT_Y));
-	keyframesCabeza[2]->setRotation(Quaternion(Ogre::Degree(-180), Vector3::UNIT_Y));
-	keyframesCabeza[3]->setRotation(Quaternion(Ogre::Degree(-270), Vector3::UNIT_Y));
-	keyframesCabeza[4]->setRotation(Quaternion(Ogre::Degree(-360), Vector3::UNIT_Y));
+		track->createNodeKeyFrame(0)->setRotation(
+			Quaternion(Ogre::Degree(0), Vector3::UNIT_Y));
 
-	cabezaNodeAnimation.state = mSM->createAnimationState("cabeza_animation_1");
+		track->createNodeKeyFrame(1)->setRotation(
+			Quaternion(Ogre::Degree(90), Vector3::UNIT_Y));
+
+		track->createNodeKeyFrame(2)->setRotation(
+			Quaternion(Ogre::Degree(180), Vector3::UNIT_Y));
+
+		track->createNodeKeyFrame(3)->setRotation(
+			Quaternion(Ogre::Degree(270), Vector3::UNIT_Y));
+
+		track->createNodeKeyFrame(4)->setRotation(
+			Quaternion(Ogre::Degree(360), Vector3::UNIT_Y));
+	}
+
+	cabezaNodeAnimation.state =
+		mSM->createAnimationState("cabezas_animation");
 
 	cabezaNodeAnimation.state->setLoop(true);
 	cabezaNodeAnimation.state->setEnabled(true);
