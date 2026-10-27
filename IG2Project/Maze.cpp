@@ -30,7 +30,18 @@ void Maze::createMaze(std::string stageFileName)
     std::string wall_material{};
     std::string light_type;
 
-    stageFile >> floor_material >> wall_material/*>> light_type*/;
+    stageFile >> floor_material >> wall_material>> light_type;
+
+    if (light_type == "directional") {
+        heroLightType = Ogre::Light::LT_DIRECTIONAL;
+    }
+    else if (light_type == "spot") {
+        heroLightType = Ogre::Light::LT_SPOTLIGHT;
+    }
+    else if (light_type == "point") {
+        heroLightType = Ogre::Light::LT_POINT;
+    }
+    else throw 1;
 
     //mHeroSpotLightNode = mSM->getRootSceneNode()->createChildSceneNode("HeroLight");
     //Light* luz = mSM->createLight("HeroLight");

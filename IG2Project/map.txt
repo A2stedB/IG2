@@ -2,6 +2,7 @@
 19
 spaceskyFloor
 stoneWall
+point
 xxxxxxxxxxxxxxxxxxx
 xhoooooooxoooooooox
 xoffoxxxoxoxxxoxxox

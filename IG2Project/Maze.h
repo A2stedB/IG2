@@ -38,6 +38,11 @@ public:
 
 	//bool is_in_a_intersection(Character* character);
 
+	Ogre::Light::LightTypes getHeroLightType() const
+	{
+		return heroLightType;
+	}
+
 private:
 	bool is_valid_index(int row,int col);
 
@@ -50,7 +55,8 @@ private:
 	std::vector<std::vector<Casilla*>> maze;
 	Ogre::SceneNode* floorNode;
 
-	Ogre::SceneNode* mHeroSpotLightNode = nullptr;
+	//Ogre::SceneNode* mHeroSpotLightNode = nullptr;
+	Ogre::Light::LightTypes heroLightType;
 };
 
 // Una clase casilla

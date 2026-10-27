@@ -57,7 +57,7 @@ protected:
     Villano* mVillano = nullptr;
 
     OgreBites::TextBox* mTextbox;
-    Ogre::SceneNode* mHeroSpotLightNode = nullptr;
+    Ogre::SceneNode* mHeroLightNode = nullptr;
 
 };
 

@@ -62,5 +62,11 @@
     <ClInclude Include="Character.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
+    <ClInclude Include="Animation.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="map.txt" />
   </ItemGroup>
 </Project>
