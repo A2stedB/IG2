@@ -1,0 +1,13 @@
+material spaceskyBackground
+{
+    technique 
+	{ 
+		pass
+		{  
+			texture_unit
+			{
+				texture spacesky.jpg
+			}
+		}
+    }
+}

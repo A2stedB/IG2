@@ -15,6 +15,7 @@ const int block_size = 20;
 Maze::Maze(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh) : IG2Object(initPos, node, sceneMng)
 {
     floorNode = this->createChildSceneNode();
+    backgroundNode = this->createChildSceneNode();
 }
 
 void Maze::createMaze(std::string stageFileName)
@@ -29,7 +30,7 @@ void Maze::createMaze(std::string stageFileName)
 
     std::string floor_material{};
     std::string wall_material{};
-    std::string light_type;
+    std::string light_type{};
 
     stageFile >> floor_material >> wall_material>> light_type;
 
@@ -44,11 +45,10 @@ void Maze::createMaze(std::string stageFileName)
     }
     else throw 1;
 
-    //mHeroSpotLightNode = mSM->getRootSceneNode()->createChildSceneNode("HeroLight");
-    //Light* luz = mSM->createLight("HeroLight");
-    //luz->setType(Ogre::Light::LT_SPOTLIGHT);
 
-    Ogre::MeshPtr floor_mesh = Ogre::MeshManager::getSingleton().createPlane("floor", /*Nombre de la malla creada*/
+
+
+    Ogre::MeshPtr background_mesh = Ogre::MeshManager::getSingleton().createPlane("background", /*Nombre de la malla creada*/
         ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, /*El grupo que pertenece este "recurso"*/
         Plane(Vector3::UNIT_Y, 0), /*El plano y su normal*/
         1500, 1500, /*Ancho y alto*/
@@ -58,13 +58,30 @@ void Maze::createMaze(std::string stageFileName)
         1, 1, /*Los tiles en el que se divide la malla en x e y*/
         Vector3::UNIT_Z);
 
+    Ogre::MeshPtr floor_mesh = Ogre::MeshManager::getSingleton().createPlane("floor", /*Nombre de la malla creada*/
+        ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, /*El grupo que pertenece este "recurso"*/
+        Plane(Vector3::UNIT_Y, 0), /*El plano y su normal*/
+        num_column*block_size, num_row*block_size, /*Ancho y alto*/
+        50, 50, /*El numero de segmentos en x e y */
+        true, /*Habilitar la normal normal*/
+        1, /*wtf el numero de las coordenadas de textura*/
+        1, 1, /*Los tiles en el que se divide la malla en x e y*/
+        Vector3::UNIT_Z);
+
+    Ogre::Entity* backgroundEntity = mSM->createEntity(background_mesh);
+    backgroundNode->attachObject(backgroundEntity);
+    backgroundEntity->setMaterialName("spaceskyBackground");
+
     Ogre::Entity* floorEntity = mSM->createEntity(floor_mesh);
     floorNode->attachObject(floorEntity);
     floorEntity->setMaterialName(floor_material);
+
     maze.resize(num_row);
 
     this->offset = Vector3(-(num_column * block_size / 2), 0, -(num_row * block_size / 2));
     floorNode->translate(-offset - Vector3(0, block_size / 2, 0));
+    backgroundNode->translate(-offset - Vector3(0, block_size / 2, 0));
+    backgroundNode->translate(Vector3(0,-2,0));
 
     for (int i = 0; i < num_row; ++i)
     {

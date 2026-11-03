@@ -1,8 +1,8 @@
 19
 19
-spaceskyFloor
+grassFloor
 stoneWall
-point
+directional
 xxxxxxxxxxxxxxxxxxx
 xhoooooooxoooooooox
 xoffoxxxoxoxxxoxxox

@@ -1,13 +1,13 @@
-material spaceskyFloor
+material grassFloor
 {
-    technique 
-	{ 
+	technique 
+	{
 		pass
-		{  
+		{
 			texture_unit
 			{
-				texture spacesky.jpg
-			}
+				texture grass.jpg
+			}	
 		}
-    }
+	}
 }

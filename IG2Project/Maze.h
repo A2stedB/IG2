@@ -54,6 +54,7 @@ private:
 	Vector3 hero_position;
 	Vector3 villano_position;
 	std::vector<std::vector<Casilla*>> maze;
+	Ogre::SceneNode* backgroundNode;
 	Ogre::SceneNode* floorNode;
 
 	//Ogre::SceneNode* mHeroSpotLightNode = nullptr;
