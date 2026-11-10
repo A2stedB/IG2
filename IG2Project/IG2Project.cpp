@@ -23,6 +23,11 @@ void IG2Project::showCurrentInfo()
 
 void IG2Project::frameRendered(const Ogre::FrameEvent& evt)
 {
+    if (mHero != nullptr) 
+    {
+        mHero->update(evt.timeSinceLastFrame);
+    }
+
     if (collisionCooldown > 0)
         collisionCooldown -= evt.timeSinceLastFrame;
 
@@ -157,32 +162,20 @@ void IG2Project::setupScene(void) {
     addInputListener(mCamMgr);
     mCamMgr->setStyle(OgreBites::CS_ORBIT);
 
+    //mMaze = new Maze(Vector3{0,0,0},mSM->getRootSceneNode()->createChildSceneNode(),mSM,"cube.mesh"/*posicion,scenenode,scenemanager,la malla*/);
+    //mMaze->createMaze("map.txt");
 
-    //------------------------------------------------------------------------
-    // Creating the light
-
-    //mSM->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
-    
-    //Light* luz = mSM->createLight("Luz");
-    //luz->setType(Ogre::Light::LT_DIRECTIONAL);
-    //luz->setDiffuseColour(0.75, 0.75, 0.75);
-
-    //mLightNode = mSM->getRootSceneNode()->createChildSceneNode("nLuz");
-    //mLightNode->attachObject(luz);
-    //mLightNode->setDirection(Ogre::Vector3(-1, -1, -1));
-
-    mMaze = new Maze(Vector3{0,0,0},mSM->getRootSceneNode()->createChildSceneNode(),mSM,"cube.mesh"/*posicion,scenenode,scenemanager,la malla*/);
-    mMaze->createMaze("map.txt");
-
-    mHero = new Hero(mMaze->getHeroStartPosition(), mSM->getRootSceneNode()->createChildSceneNode(), mSM, "Sinbad.mesh",10.0f);
-    mVillano = new Villano(mMaze->getVillanoStartPosition(), mSM->getRootSceneNode()->createChildSceneNode(), mSM, 10.0f);
+    //mHero = new Hero(mMaze->getHeroStartPosition(), mSM->getRootSceneNode()->createChildSceneNode(), mSM, "Sinbad.mesh",10.0f);
+    mHero = new Hero(Vector3(0,0,0), mSM->getRootSceneNode()->createChildSceneNode(), mSM, "Sinbad.mesh", 10.0f);
+    mHero->setScale(Vector3(10,10,10));
+    //mVillano = new Villano(mMaze->getVillanoStartPosition(), mSM->getRootSceneNode()->createChildSceneNode(), mSM, 10.0f);
 
 
     vp = getRenderWindow()->getViewport(0);
     vp->setMaterialScheme(Ogre::RTShader::ShaderGenerator::DEFAULT_SCHEME_NAME);
 
     Light* luz = mSM->createLight("Luz");
-    Ogre::Light::LightTypes heroLightType = mMaze->getHeroLightType();
+    Ogre::Light::LightTypes heroLightType = Light::LightTypes::LT_DIRECTIONAL;
     luz->setType(heroLightType);
 
     if (heroLightType == Ogre::Light::LT_DIRECTIONAL) {

@@ -3,10 +3,11 @@
 
 class Casilla : public IG2Object
 {
-public:
+protected:
 	Casilla() {};
 	Casilla(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh);
 	Casilla(Vector3 initPos, SceneNode* node, SceneManager* sceneMng);
+public:
 	bool canPassThrough();
 	virtual void update(float dt){};
 protected:
