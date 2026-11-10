@@ -1,0 +1,13 @@
+material stoneFloorInitial
+{
+	technique 
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture floor_diffuse.png
+			}	
+		}
+	}
+}

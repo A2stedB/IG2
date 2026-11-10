@@ -22,6 +22,8 @@ public:
 	void update(float dt);
 
 	void ani_update(float dt);
+
+	void setup_ingame();
 private:
 	bool is_in_initial_screen = true;
 	int lives = 3;

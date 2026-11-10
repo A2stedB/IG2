@@ -50,6 +50,7 @@ Hero::Hero(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh
 	sword_l->setVisible(false);
 	sword_r->setVisible(false);
 
+
 	//danceAnimationState->setWeight(10);
 
 	//ani_set = entity->getAllAnimationStates();
@@ -75,7 +76,7 @@ void Hero::loseLife()
 
 void Hero::update(float dt)
 {
-	ani_update(dt);
+	//ani_update(dt);
 }
 
 void Hero::ani_update(float dt)
@@ -146,4 +147,23 @@ void Hero::ani_update(float dt)
 			std::cout << "Reseting" << std::endl;
 		}
 	}
+}
+
+void Hero::setup_ingame()
+{
+	danceAnimationState->setEnabled(false);
+	danceAnimationState->setTimePosition(0);
+
+	runBaseAnimationState->setEnabled(false);
+	runBaseAnimationState->setTimePosition(0);
+
+	runTopAnimationState->setEnabled(false);
+	runTopAnimationState->setTimePosition(0);
+
+	translateAnimation.state->setEnabled(false);
+	translateAnimation.state->setTimePosition(0);
+
+	entity->detachAllObjectsFromBone();
+	sword_l->setVisible(false);
+	sword_r->setVisible(false);
 }

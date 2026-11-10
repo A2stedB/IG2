@@ -30,6 +30,10 @@ public:
     Quaternion getQuaternionForNewDirection() const;
 
     void showCurrentInfo();
+
+private:
+    void setup_game_scene();
+
 protected:
     virtual void frameRendered(const Ogre::FrameEvent& evt);
     virtual bool keyPressed(const OgreBites::KeyboardEvent& evt);
@@ -56,8 +60,14 @@ protected:
     Hero* mHero = nullptr;
     Villano* mVillano = nullptr;
 
+    Ogre::SceneNode* floorNode = nullptr;
+
     OgreBites::TextBox* mTextbox;
     Ogre::SceneNode* mHeroLightNode = nullptr;
+
+
+
+    bool in_game = false;
 
     float collisionCooldown = 0.0f;
 };
