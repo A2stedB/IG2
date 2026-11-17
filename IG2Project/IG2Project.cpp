@@ -1,5 +1,6 @@
 ﻿#include "IG2Project.h"
 #include "Maze.h"
+#include "Bomb.h"
 #include <OgreTrays.h>
 using namespace std;
 using namespace Ogre;
@@ -26,7 +27,14 @@ void IG2Project::frameRendered(const Ogre::FrameEvent& evt)
 {
     if (!in_game) 
     {
-        mHero->ani_update(evt.timeSinceLastFrame);
+        if (mHero != nullptr) {
+            mHero->ani_update(evt.timeSinceLastFrame);
+        }
+
+        if (mBomb != nullptr) 
+        {
+            mBomb->update(evt.timeSinceLastFrame);
+        }
         return;
     }
 
@@ -109,10 +117,20 @@ bool IG2Project::keyPressed(const OgreBites::KeyboardEvent& evt)
     }
     else 
     {
-        if (evt.keysym.sym == SDLK_s) 
+        if (mHero != nullptr) {
+            if (evt.keysym.sym == SDLK_s) 
+            {
+                in_game = true;
+                setup_game_scene();
+            }
+        }
+
+        if (mBomb != nullptr) 
         {
-            in_game = true;
-            setup_game_scene();
+            if (evt.keysym.sym == SDLK_k) 
+            {
+                mBomb->toggle();
+            }
         }
     }
 
@@ -183,13 +201,11 @@ void IG2Project::setupScene(void) {
     addInputListener(mCamMgr);
     mCamMgr->setStyle(OgreBites::CS_ORBIT);
 
-    //mMaze = new Maze(Vector3{0,0,0},mSM->getRootSceneNode()->createChildSceneNode(),mSM,"cube.mesh"/*posicion,scenenode,scenemanager,la malla*/);
-    //mMaze->createMaze("map.txt");
 
-    //mHero = new Hero(mMaze->getHeroStartPosition(), mSM->getRootSceneNode()->createChildSceneNode(), mSM, "Sinbad.mesh",10.0f);
-    mHero = new Hero(Vector3(0,0,0), mSM->getRootSceneNode()->createChildSceneNode(), mSM, "Sinbad.mesh", 10.0f);
-    mHero->setScale(Vector3(10,10,10));
-    //mVillano = new Villano(mMaze->getVillanoStartPosition(), mSM->getRootSceneNode()->createChildSceneNode(), mSM, 10.0f);
+    //mHero = new Hero(Vector3(0,0,0), mSM->getRootSceneNode()->createChildSceneNode(), mSM, "Sinbad.mesh", 10.0f);
+    //mHero->setScale(Vector3(10,10,10));
+
+    mBomb = new Bomb(Vector3(0,0,0), mSM->getRootSceneNode()->createChildSceneNode(),mSM);
 
 
     vp = getRenderWindow()->getViewport(0);

@@ -20,6 +20,8 @@
 #include "Hero.h"
 #include "Villano.h"
 
+class Bomb;
+
 
 class IG2Project: public OgreBites::ApplicationContext, OgreBites::InputListener {
 
@@ -59,6 +61,7 @@ protected:
     Maze* mMaze = nullptr;
     Hero* mHero = nullptr;
     Villano* mVillano = nullptr;
+    Bomb* mBomb = nullptr;
 
     Ogre::SceneNode* floorNode = nullptr;
 

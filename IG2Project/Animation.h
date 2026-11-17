@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 #include <OgreAnimation.h>
 #include <OgreKeyFrame.h>
 
@@ -30,6 +31,12 @@ struct NodeAnimation
         frame->setRotation(rotation);
         frame->setScale(scale);
         keyframes.push_back(frame);
+    }
+
+    void addTime(float dt)
+    {
+        std::cout << "animando" << std::endl;
+        state->addTime(dt);
     }
 
     float ani_duration = 0;

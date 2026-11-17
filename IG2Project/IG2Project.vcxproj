@@ -27,6 +27,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Bomb.cpp" />
     <ClCompile Include="Casilla.cpp" />
     <ClCompile Include="Character.cpp" />
     <ClCompile Include="Hero.cpp" />
@@ -38,6 +39,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h" />
+    <ClInclude Include="Bomb.h" />
     <ClInclude Include="Casilla.h" />
     <ClInclude Include="Character.h" />
     <ClInclude Include="Hero.h" />

@@ -1,0 +1,77 @@
+particle_system smokeParticle
+{
+    billboard_type point
+    particle_width 35
+    particle_height 35
+    quota 1000
+    material smoke
+
+    emitter Point{
+        direction 0 1 0
+        position 0 0 0
+        angle 12
+        //angle 120
+        emission_rate 50
+        time_to_live 10
+        //time_to_live 1.5
+        velocity_min 50
+        velocity_max 80
+        //colour 0.4 0.4 0.4 0.4
+        //colour 1 0 0 0.5
+        colour 0.0 0.0 0.65 1.0
+        duration 10
+    }
+
+    affector ColourFader{
+        red 0.06
+        green 0.06
+        blue 0.06
+        alpha -0.06
+    }
+
+    affector Scaler{
+        rate 50
+    }
+}
+
+particle_system animatedSmokeParticle
+{
+    billboard_type point
+    texture_sheet_size 3 5
+    material animatedSmoke
+    particle_width 35
+    particle_height 35
+    quota 500
+
+    emitter Point{
+        position 0 0 0
+        direction 0 1 0
+        angle 12
+        //angle 120
+        emission_rate 50
+        time_to_live 10
+        //time_to_live 1.5
+        velocity_min 50
+        velocity_max 80
+        colour 1.0 0.65 0.0 0.55
+        duration 10
+    }
+
+    affector TextureAnimator{
+        texcoord_start 0
+        texcoord_count 15
+        duration 2.4
+        random_offset true
+    }
+
+    affector ColourFader{
+        red 0.06
+        green 0.06
+        blue 0.06
+        alpha -0.06
+    }
+
+    affector Scaler{
+        rate 50
+    }
+}

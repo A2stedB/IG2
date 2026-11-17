@@ -1,0 +1,45 @@
+material bombMecha
+{
+	technique 
+	{
+		pass
+		{
+			texture_unit
+			{
+				texture WoodFloor043_1K_Color.jpg
+			}	
+		}
+	}
+}
+
+material smoke{
+    technique{
+        pass{
+            lighting off
+            scene_blend alpha_blend
+            depth_write off
+            diffuse vertexcolour
+
+            texture_unit{
+                texture smoke.png
+                tex_address_mode clamp
+            }
+        }
+    }
+}
+
+material animatedSmoke{
+    technique{
+        pass{
+            lighting off
+            scene_blend alpha_blend
+            depth_write off
+            diffuse vertexcolour
+
+            texture_unit{
+                texture Smoke15Frames.png
+                tex_address_mode clamp
+            }
+        }
+    }
+}

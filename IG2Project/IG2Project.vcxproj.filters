@@ -39,6 +39,9 @@
     <ClCompile Include="Character.cpp">
       <Filter>Archivos de origen</Filter>
     </ClCompile>
+    <ClCompile Include="Bomb.cpp">
+      <Filter>Archivos de origen</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IG2Project.h">
@@ -63,6 +66,9 @@
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
     <ClInclude Include="Animation.h">
+      <Filter>Archivos de encabezado</Filter>
+    </ClInclude>
+    <ClInclude Include="Bomb.h">
       <Filter>Archivos de encabezado</Filter>
     </ClInclude>
   </ItemGroup>
