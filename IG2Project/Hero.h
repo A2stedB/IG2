@@ -2,6 +2,7 @@
 #include "IG2Object.h"
 #include "Character.h"
 #include "Animation.h"
+#include <OgreTimer.h>
 
 class Hero : public Character
 {
@@ -24,6 +25,10 @@ public:
 	void ani_update(float dt);
 
 	void setup_ingame();
+
+	bool canSpawnBomb();
+
+	int getMaxBomb() const;
 private:
 	bool is_in_initial_screen = true;
 	int lives = 3;
@@ -44,6 +49,14 @@ private:
 
 	float ani_elapsed_time = 0;
 	float ani_total_duration = 21;
+
+	Ogre::Timer bombTimer;
+
+	float bomb_elapsedTime = 0;
+	float bomb_coldown = 0;
+
+	int max_bomb = 2;
+
 	
 };
 

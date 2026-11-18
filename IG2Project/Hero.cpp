@@ -166,4 +166,21 @@ void Hero::setup_ingame()
 	entity->detachAllObjectsFromBone();
 	sword_l->setVisible(false);
 	sword_r->setVisible(false);
+	
+	bombTimer = Ogre::Timer();
+
+}
+
+int Hero::getMaxBomb() const {
+	return max_bomb;
+}
+
+bool Hero::canSpawnBomb() {
+	
+	if (bombTimer.getMilliseconds() > bomb_coldown) {
+		bombTimer.reset();
+		return true;
+	}
+	else return false;
+
 }

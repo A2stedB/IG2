@@ -31,11 +31,25 @@ void IG2Project::frameRendered(const Ogre::FrameEvent& evt)
             mHero->ani_update(evt.timeSinceLastFrame);
         }
 
-        if (mBomb != nullptr) 
-        {
-            mBomb->update(evt.timeSinceLastFrame);
-        }
+        //if (mBomb != nullptr) 
+        //{
+        //    mBomb->update(evt.timeSinceLastFrame);
+        //}
+
         return;
+    }
+
+    for (auto bomb : notActivatedBombs) {
+        bomb->update(evt.timeSinceLastFrame);
+        if (bomb->isExploded()) {
+            Bomb* bomb = notActivatedBombs.front();
+            activatedBombs.push_back(bomb);
+            notActivatedBombs.pop_front();
+        }
+    }
+
+    for (auto bomb : activatedBombs) {
+        //bomb->updateSmoke(evt.timeSinceLastFrame);
     }
 
     if (mHero != nullptr) 
@@ -94,7 +108,7 @@ bool IG2Project::keyPressed(const OgreBites::KeyboardEvent& evt)
     if (in_game) {
         // Print the Sinbad's position
         if (evt.keysym.sym == SDLK_k) {
-            cout << "Position of Sinbad: " << mSinbadNode->getPosition() << endl;
+            cout << "Position of Sinbad: " << mHero->getPosition() << endl;
         }
         else if (evt.keysym.sym == SDLK_UP) {
             cout << "Pressed UP" << endl;
@@ -112,6 +126,13 @@ bool IG2Project::keyPressed(const OgreBites::KeyboardEvent& evt)
             cout << "Pressed RIGHT" << endl;
             nextDir = Vector3::UNIT_X;
         }
+        else if (evt.keysym.sym == SDLK_SPACE) {
+            cout << "Pressed SPACE" << endl;
+            if (notActivatedBombs.size() < mHero->getMaxBomb() && mHero->canSpawnBomb()) {
+                Bomb* bomb = new Bomb(mHero->getPosition(), mSM->getRootSceneNode()->createChildSceneNode(), mSM);
+                notActivatedBombs.push_back(bomb);
+            }
+        }
 
 	    mHero->setDirection(nextDir);
     }
@@ -125,13 +146,13 @@ bool IG2Project::keyPressed(const OgreBites::KeyboardEvent& evt)
             }
         }
 
-        if (mBomb != nullptr) 
-        {
-            if (evt.keysym.sym == SDLK_k) 
-            {
-                mBomb->toggle();
-            }
-        }
+        //if (mBomb != nullptr) 
+        //{
+        //    if (evt.keysym.sym == SDLK_k) 
+        //    {
+        //        mBomb->toggle();
+        //    }
+        //}
     }
 
     return true;
@@ -202,10 +223,10 @@ void IG2Project::setupScene(void) {
     mCamMgr->setStyle(OgreBites::CS_ORBIT);
 
 
-    //mHero = new Hero(Vector3(0,0,0), mSM->getRootSceneNode()->createChildSceneNode(), mSM, "Sinbad.mesh", 10.0f);
-    //mHero->setScale(Vector3(10,10,10));
+    mHero = new Hero(Vector3(0,0,0), mSM->getRootSceneNode()->createChildSceneNode(), mSM, "Sinbad.mesh", 10.0f);
+    mHero->setScale(Vector3(10,10,10));
 
-    mBomb = new Bomb(Vector3(0,0,0), mSM->getRootSceneNode()->createChildSceneNode(),mSM);
+    //mBomb = new Bomb(Vector3(0,0,0), mSM->getRootSceneNode()->createChildSceneNode(),mSM);
 
 
     vp = getRenderWindow()->getViewport(0);

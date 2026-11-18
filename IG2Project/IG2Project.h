@@ -19,11 +19,12 @@
 #include "Maze.h"
 #include "Hero.h"
 #include "Villano.h"
+#include <deque>
 
 class Bomb;
 
 
-class IG2Project: public OgreBites::ApplicationContext, OgreBites::InputListener {
+class IG2Project : public OgreBites::ApplicationContext, OgreBites::InputListener {
 
 public:
     explicit IG2Project() : OgreBites::ApplicationContext("IG2Project") {};
@@ -35,6 +36,7 @@ public:
 
 private:
     void setup_game_scene();
+    void spawnBomb();
 
 protected:
     virtual void frameRendered(const Ogre::FrameEvent& evt);
@@ -63,11 +65,13 @@ protected:
     Villano* mVillano = nullptr;
     Bomb* mBomb = nullptr;
 
+    deque<Bomb*> notActivatedBombs;
+    deque<Bomb*> activatedBombs;
+
     Ogre::SceneNode* floorNode = nullptr;
 
     OgreBites::TextBox* mTextbox;
     Ogre::SceneNode* mHeroLightNode = nullptr;
-
 
 
     bool in_game = false;

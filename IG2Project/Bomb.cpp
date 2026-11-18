@@ -2,7 +2,7 @@
 #include <iostream>
 #include <OgreParticleSystem.h>
 
-Bomb::Bomb(Vector3 initPos, SceneNode* node, SceneManager* sceneMng) :
+Bomb::Bomb(Vector3 initPos, SceneNode* node, SceneManager* sceneMng ) :
 	IG2Object(initPos,node,sceneMng)
 {
 	cuerpo = node->createChildSceneNode();
@@ -16,9 +16,9 @@ Bomb::Bomb(Vector3 initPos, SceneNode* node, SceneManager* sceneMng) :
 	mecha->attachObject(entity);
 	entity->setMaterialName("bombMecha");
 
-	cuerpo->setScale(0.5,0.5,0.5);
+	cuerpo->setScale(0.1,0.1,0.1);
 	mecha->translate(Vector3(0,50,0));
-	mecha->setScale(0.1, 0.1, 0.1);
+	mecha->setScale(0.02, 0.02, 0.02);
 
 	cuerpoAnimation = NodeAnimation();
 	cuerpoAnimation.setup(sceneMng,"bomb_cuerpo",EXPLOSTION_TIME);
@@ -45,7 +45,7 @@ Bomb::Bomb(Vector3 initPos, SceneNode* node, SceneManager* sceneMng) :
 	mechaAnimation.addKeyframe(0,particleSystemNode->getPosition(),particleSystemNode->getOrientation(),particleSystemNode->getScale());
 	mechaAnimation.addKeyframe(EXPLOSTION_TIME,Vector3(0,0,0), particleSystemNode->getOrientation(), particleSystemNode->getScale());
 	
-
+	//toggle();
 }
 
 void Bomb::update(float dt)
@@ -65,6 +65,7 @@ void Bomb::update(float dt)
 		particleSystem->setEmitting(false);
 		is_active = false;
 		std::cout << "Termino" << std::endl;
+		exploded = true;
 	}
 }
 
@@ -81,3 +82,8 @@ void Bomb::toggle()
 		particleSystem->setEmitting(true);
 	}
 }
+
+bool Bomb::isExploded() const {
+	return exploded;
+}
+
