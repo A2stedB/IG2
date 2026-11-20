@@ -19,7 +19,7 @@ particle_system smokeParticle
         //colour 0.4 0.4 0.4 0.4
         //colour 1 0 0 0.5
         colour 0.0 0.0 0.65 1.0
-        duration 10
+        duration 0
     }
 
     affector ColourFader{
@@ -73,5 +73,41 @@ particle_system animatedSmokeParticle
 
     affector Scaler{
         rate 50
+    }
+}
+
+particle_system explosionSmokeParticle
+{
+    billboard_type point
+    texture_sheet_size 3 5
+    material animatedSmoke
+    particle_width 12
+    particle_height 12
+    quota 300
+
+    emitter Point{
+        direction 0 1 0
+        position 0 0 0
+        angle 100
+        emission_rate 100
+        time_to_live 1.5
+        velocity_min 3
+        velocity_max 8
+        colour 0.5 0.5 0.5 0.7
+        duration 0
+    }
+
+    affector TextureAnimator{
+        texcoord_start 0
+        texcoord_count 15
+        duration 1.5
+    }
+
+    affector ColourFader{
+        alpha -0.4
+    }
+
+    affector Scaler{
+        rate 3
     }
 }

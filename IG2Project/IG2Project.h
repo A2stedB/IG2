@@ -1,4 +1,4 @@
-#ifndef __IG2PROJECT_H__
+﻿#ifndef __IG2PROJECT_H__
 #define __IG2PROJECT_H__
 
 #include <OgreApplicationContext.h>
@@ -75,6 +75,7 @@ protected:
 
 
     bool in_game = false;
+    bool villanoAlive = true;
 
     float collisionCooldown = 0.0f;
 };

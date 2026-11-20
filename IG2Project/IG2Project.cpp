@@ -25,140 +25,157 @@ void IG2Project::showCurrentInfo()
 
 void IG2Project::frameRendered(const Ogre::FrameEvent& evt)
 {
-    if (!in_game) 
+    const float dt = evt.timeSinceLastFrame;
+
+    if (!in_game)
     {
-        if (mHero != nullptr) {
-            mHero->ani_update(evt.timeSinceLastFrame);
-        }
-
-        //if (mBomb != nullptr) 
-        //{
-        //    mBomb->update(evt.timeSinceLastFrame);
-        //}
-
+        if (mHero != nullptr) mHero->ani_update(dt);
         return;
     }
 
-    for (auto bomb : notActivatedBombs) {
-        bomb->update(evt.timeSinceLastFrame);
-        if (bomb->isExploded()) {
-            Bomb* bomb = notActivatedBombs.front();
-            activatedBombs.push_back(bomb);
-            notActivatedBombs.pop_front();
-        }
-    }
+    if (collisionCooldown > 0.0f)
+        collisionCooldown -= dt;
 
-    for (auto bomb : activatedBombs) {
-        //bomb->updateSmoke(evt.timeSinceLastFrame);
-    }
+    if (mHero != nullptr) mHero->update(dt);
 
-    if (mHero != nullptr) 
+    if (mMaze != nullptr)
+        mMaze->update(dt, mHero, villanoAlive ? mVillano : nullptr);
+
+    if (villanoAlive && mVillano != nullptr)
+        mVillano->update(dt);
+
+    // Avanzamos las bombas activas sin modificar el contenedor durante un for-range.
+    for (auto it = activatedBombs.begin(); it != activatedBombs.end(); )
     {
-        mHero->update(evt.timeSinceLastFrame);
-    }
+        Bomb* bomb = *it;
+        bomb->update(dt);
 
-    if (collisionCooldown > 0)
-        collisionCooldown -= evt.timeSinceLastFrame;
+        if (bomb->isExploded())
+        {
+            // Maze crea el humo y comprueba los BLOQUES afectados en este instante.
+            ExplosionResult result = mMaze->explodeBomb(
+                bomb->getPosition(), mHero, villanoAlive ? mVillano : nullptr);
 
-    if (mMaze != nullptr) {
+            it = activatedBombs.erase(it);
+            notActivatedBombs.push_back(bomb); // Se reutilizara con otra barra espaciadora.
 
-        if (mHero != nullptr && mVillano != nullptr) {
+            if (result.villanoHit && mVillano != nullptr && villanoAlive)
+            {
+                villanoAlive = false;
+                mVillano->setVisible(false);
+            }
 
-            mMaze->update(evt.timeSinceLastFrame, mHero, mVillano);
-
-            mVillano->update(evt.timeSinceLastFrame);
-
-            // Colision entre heroe y villano
-            if (collisionCooldown <= 0 &&
-                mHero->getAABB().intersects(mVillano->getAABB())) {
-
+            if (result.heroHit && mHero != nullptr && collisionCooldown <= 0.0f)
+            {
                 mHero->loseLife();
-
-                if (mHero->getLives() > 0) {
-
-                    // Volver al inicio del laberinto
-                    mHero->setPosition(mMaze->getHeroStartPosition());
-
-                    collisionCooldown = 1.0f;
-                }
-                else {
-
-                    // Fin del juego
+                if (mHero->getLives() <= 0)
+                {
                     getRoot()->queueEndRendering();
                     return;
                 }
+                mHero->setPosition(mMaze->getHeroStartPosition());
+                collisionCooldown = 1.0f;
             }
+        }
+        else
+        {
+            ++it;
         }
     }
 
-    if (mTextbox != nullptr)
+    // Colision habitual entre personajes (independiente de las explosiones).
+    if (collisionCooldown <= 0.0f && mHero != nullptr &&
+        villanoAlive && mVillano != nullptr &&
+        mHero->getAABB().intersects(mVillano->getAABB()))
     {
-        showCurrentInfo();
+        mHero->loseLife();
+        if (mHero->getLives() <= 0)
+        {
+            getRoot()->queueEndRendering();
+            return;
+        }
+        mHero->setPosition(mMaze->getHeroStartPosition());
+        collisionCooldown = 1.0f;
     }
+
+    if (mTextbox != nullptr) showCurrentInfo();
 }
 
-bool IG2Project::keyPressed(const OgreBites::KeyboardEvent& evt) 
+void IG2Project::spawnBomb()
 {
+    if (mHero == nullptr || mMaze == nullptr) return;
+    if (activatedBombs.size() >= static_cast<size_t>(mHero->getMaxBomb())) return;
 
-    // ESC key finished the rendering...
-    if (evt.keysym.sym == SDLK_ESCAPE) {
-        getRoot()->queueEndRendering();
-    }
+    Casilla* block = mMaze->getCasillaAtPosition(mHero->getPosition());
+    if (block == nullptr || !block->canPassThrough()) return;
 
-    if (in_game) {
-        // Print the Sinbad's position
-        if (evt.keysym.sym == SDLK_k) {
-            cout << "Position of Sinbad: " << mHero->getPosition() << endl;
-        }
-        else if (evt.keysym.sym == SDLK_UP) {
-            cout << "Pressed UP" << endl;
-            nextDir = Vector3::NEGATIVE_UNIT_Z;
-        }
-        else if (evt.keysym.sym == SDLK_DOWN) {
-            cout << "Pressed DOWN" << endl;
-            nextDir = Vector3::UNIT_Z;
-        }
-        else if (evt.keysym.sym == SDLK_LEFT) {
-            cout << "Pressed LEFT" << endl;
-            nextDir = Vector3::NEGATIVE_UNIT_X;
-        }
-        else if (evt.keysym.sym == SDLK_RIGHT) {
-            cout << "Pressed RIGHT" << endl;
-            nextDir = Vector3::UNIT_X;
-        }
-        else if (evt.keysym.sym == SDLK_SPACE) {
-            cout << "Pressed SPACE" << endl;
-            if (notActivatedBombs.size() < mHero->getMaxBomb() && mHero->canSpawnBomb()) {
-                Bomb* bomb = new Bomb(mHero->getPosition(), mSM->getRootSceneNode()->createChildSceneNode(), mSM);
-                notActivatedBombs.push_back(bomb);
-            }
-        }
+    // no se puede poner segunda bomba sobre la misma casilla.
+    for (Bomb* active : activatedBombs)
+        if (mMaze->getCasillaAtPosition(active->getPosition()) == block)
+            return;
 
-	    mHero->setDirection(nextDir);
-    }
-    else 
+    if (!mHero->canSpawnBomb()) return;
+
+    Bomb* bomb = nullptr;
+    if (!notActivatedBombs.empty())
     {
-        if (mHero != nullptr) {
-            if (evt.keysym.sym == SDLK_s) 
-            {
-                in_game = true;
-                setup_game_scene();
-            }
-        }
-
-        //if (mBomb != nullptr) 
-        //{
-        //    if (evt.keysym.sym == SDLK_k) 
-        //    {
-        //        mBomb->toggle();
-        //    }
-        //}
+        bomb = notActivatedBombs.front();
+        notActivatedBombs.pop_front();
     }
+    else
+    {
+        bomb = new Bomb(Vector3::ZERO,
+            mSM->getRootSceneNode()->createChildSceneNode(), mSM);
+    }
+
+    // La casilla es hija de Maze, asi que getPosition() es local
+    Vector3 worldCenter = block->getPosition() + mMaze->getPosition();
+    bomb->activate(worldCenter);
+    activatedBombs.push_back(bomb);
+}
+
+bool IG2Project::keyPressed(const OgreBites::KeyboardEvent& evt)
+{
+    if (evt.keysym.sym == SDLK_ESCAPE)
+    {
+        getRoot()->queueEndRendering();
+        return true;
+    }
+
+    if (!in_game)
+    {
+        if (mHero != nullptr && evt.keysym.sym == SDLK_s)
+        {
+            in_game = true;
+            setup_game_scene();
+        }
+        return true;
+    }
+
+    if (mHero == nullptr) return true;
+
+    if (evt.keysym.sym == SDLK_k)
+        cout << "Position of Sinbad: " << mHero->getPosition() << endl;
+    else if (evt.keysym.sym == SDLK_UP)
+        mHero->setDirection(Vector3::NEGATIVE_UNIT_Z);
+    else if (evt.keysym.sym == SDLK_DOWN)
+        mHero->setDirection(Vector3::UNIT_Z);
+    else if (evt.keysym.sym == SDLK_LEFT)
+        mHero->setDirection(Vector3::NEGATIVE_UNIT_X);
+    else if (evt.keysym.sym == SDLK_RIGHT)
+        mHero->setDirection(Vector3::UNIT_X);
+    else if (evt.keysym.sym == SDLK_SPACE)
+        spawnBomb();
 
     return true;
 }
 
 void IG2Project::shutdown() {
+
+    for (Bomb* bomb : activatedBombs) delete bomb;
+    for (Bomb* bomb : notActivatedBombs) delete bomb;
+    activatedBombs.clear();
+    notActivatedBombs.clear();
 
     delete mMaze;
     mShaderGenerator->removeSceneManager(mSM);
@@ -309,6 +326,7 @@ void IG2Project::setup_game_scene()
     mHero->setScale(Vector3(1, 1, 1));
     mHero->setup_ingame();
     mVillano = new Villano(mMaze->getVillanoStartPosition(), mSM->getRootSceneNode()->createChildSceneNode(), mSM, 10.0f);
+    villanoAlive = true;
 
     Viewport* vp = getRenderWindow()->getViewport(0);
 

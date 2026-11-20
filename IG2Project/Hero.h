@@ -53,7 +53,7 @@ private:
 	Ogre::Timer bombTimer;
 
 	float bomb_elapsedTime = 0;
-	float bomb_coldown = 0;
+	float bomb_coldown = 250; // milisegundos entre colocaciones
 
 	int max_bomb = 2;
 

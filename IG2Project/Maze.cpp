@@ -2,6 +2,7 @@
 #include <cmath>
 #include <fstream>
 #include "Character.h"
+#include <string>
 
 constexpr const char MURO = 'x';
 constexpr const char HUECO = 'o';
@@ -11,6 +12,9 @@ constexpr const char INVISIBLE = 'i';
 constexpr const char VILLANO = 'v';
 
 const int block_size = 20;
+constexpr int BOMB_RANGE = 5;             // Alcance en bloques, sin contar el origen.
+constexpr float SMOKE_EMIT_TIME = 0.45f; // Tiempo soltando humo.
+constexpr float SMOKE_LIFETIME = 2.5f;  // Tiempo hasta limpiar las particulas.
 
 Maze::Maze(Vector3 initPos, SceneNode* node, SceneManager* sceneMng, String mesh) : IG2Object(initPos, node, sceneMng)
 {
@@ -77,6 +81,8 @@ void Maze::createMaze(std::string stageFileName)
     floorEntity->setMaterialName(floor_material);
 
     maze.resize(num_row);
+    smokeCells.resize(num_row);
+    for (auto& fila : smokeCells) fila.resize(num_column);
 
     this->offset = Vector3(-(num_column * block_size / 2), 0, -(num_row * block_size / 2));
     floorNode->translate(-offset - Vector3(0, block_size / 2, 0));
@@ -125,14 +131,17 @@ void Maze::createMaze(std::string stageFileName)
             }
 
             //redimensionar escalando
-            Vector3 size = bloque->calculateBoxSize();
-            float propX, propY, propZ;
-
-            propX = block_size / size.x;
-            propY = block_size / size.y;
-            propZ = block_size / size.z;
-
-            bloque->setScale(Vector3(propX, propY, propZ));
+            if (bloque->hasEntity())
+            {
+                Vector3 size = bloque->calculateBoxSize();
+                if (size.x > 0 && size.y > 0 && size.z > 0)
+                {
+                    float propX = block_size / size.x;
+                    float propY = block_size / size.y;
+                    float propZ = block_size / size.z;
+                    bloque->setScale(Vector3(propX, propY, propZ));
+                }
+            }
 
             maze[i].push_back(bloque);
 
@@ -281,8 +290,9 @@ void Maze::moveCharacter(Character* character, float dt)
 
 void Maze::update(float dt, Hero* hero, Villano* villano)
 {
-    moveCharacter(hero, dt);
-    moveCharacter(villano, dt);
+    if (hero != nullptr) moveCharacter(hero, dt);
+    if (villano != nullptr) moveCharacter(villano, dt);
+    updateSmoke(dt);
 
     for (int i = 0; i < num_row; ++i)
     {
@@ -313,6 +323,111 @@ void Maze::update(float dt, Hero* hero, Villano* villano)
 
 bool Maze::is_valid_index(int row, int col)
 {
-    return row < 0 || row >= num_row || col < 0 || col >= num_column;
+    return row >= 0 && row < num_row && col >= 0 && col < num_column;
 }
 
+
+// El humo se guarda por casilla
+
+void Maze::emitSmoke(int row, int col)
+{
+    if (!is_valid_index(row, col)) return;
+    SmokeCell& smoke = smokeCells[row][col];
+
+    if (smoke.system == nullptr)
+    {
+        Ogre::SceneNode* node = this->createChildSceneNode();
+        node->setPosition(maze[row][col]->getPosition() + Vector3(0, 2, 0));
+
+        std::string name = "humo_casilla_" + std::to_string(row) + "_" + std::to_string(col);
+        smoke.system = mSM->createParticleSystem(name, "explosionSmokeParticle");
+        node->attachObject(smoke.system);
+        smoke.system->setEmitting(false);
+    }
+
+    // Una nueva explosion reinicia el efecto de esta casilla.
+    smoke.system->setEmitting(false);
+    smoke.system->clear();
+    smoke.system->setEmitting(true);
+    smoke.emitRemaining = SMOKE_EMIT_TIME;
+    smoke.clearRemaining = SMOKE_LIFETIME;
+}
+
+void Maze::updateSmoke(float dt)
+{
+    for (auto& fila : smokeCells)
+    {
+        for (SmokeCell& smoke : fila)
+        {
+            if (smoke.system == nullptr) continue;
+
+            if (smoke.emitRemaining > 0.0f)
+            {
+                smoke.emitRemaining -= dt;
+                if (smoke.emitRemaining <= 0.0f)
+                    smoke.system->setEmitting(false);
+            }
+
+            if (smoke.clearRemaining > 0.0f)
+            {
+                smoke.clearRemaining -= dt;
+                if (smoke.clearRemaining <= 0.0f)
+                {
+                    smoke.system->setEmitting(false);
+                    smoke.system->clear();
+                }
+            }
+        }
+    }
+}
+
+ExplosionResult Maze::explodeBomb(Vector3 position, Hero* hero, Villano* villano)
+{
+    ExplosionResult result;
+
+    Casilla* origin = getCasillaAtPosition(position);
+
+    if (origin == nullptr || !origin->canPassThrough())
+        return result;
+
+    Casilla* heroBlock = hero ? getCasillaAtPosition(hero->getPosition()) : nullptr;
+    Casilla* villanoBlock = villano ? getCasillaAtPosition(villano->getPosition()) : nullptr;
+
+    Vector3 center = origin->getPosition() + offset;
+
+    Vector3 directions[4] = {
+        Vector3::UNIT_X,
+        Vector3::NEGATIVE_UNIT_X,
+        Vector3::UNIT_Z,
+        Vector3::NEGATIVE_UNIT_Z
+    };
+
+    for (int i = 0; i < 4; ++i)
+    {
+        // La casilla de origen solo se procesa una vez
+        for (int j = (i == 0 ? 0 : 1); j <= BOMB_RANGE; ++j)
+        {
+            Vector3 pos = center + directions[i] * block_size * j;
+
+            Casilla* bloque = getCasillaAtPosition(pos);
+
+            if (bloque == nullptr || !bloque->canPassThrough())
+                break;
+
+            Vector3 local = bloque->getPosition();
+
+            int row = std::round(local.z / block_size);
+            int col = std::round(local.x / block_size);
+
+            emitSmoke(row, col);
+
+            if (bloque == heroBlock)
+                result.heroHit = true;
+
+            if (bloque == villanoBlock)
+                result.villanoHit = true;
+        }
+    }
+
+    return result;
+}

@@ -5,8 +5,15 @@
 #include "Casilla.h"
 #include "Hero.h"
 #include "Villano.h"
+#include <OgreParticleSystem.h>
 
 class Hero;
+
+struct ExplosionResult
+{
+    bool heroHit = false;
+    bool villanoHit = false;
+};
 
 class Maze : public IG2Object
 {
@@ -37,6 +44,8 @@ public:
 
 	void update(float dt,Hero* hero, Villano* villano);
 
+    ExplosionResult explodeBomb(Vector3 position, Hero* hero, Villano* villano);
+
 	//bool is_in_a_intersection(Character* character);
 
 	Ogre::Light::LightTypes getHeroLightType() const
@@ -46,6 +55,8 @@ public:
 
 private:
 	bool is_valid_index(int row,int col);
+    void emitSmoke(int row, int col);
+    void updateSmoke(float dt);
 
 private:
 	Vector3 offset;
@@ -54,6 +65,14 @@ private:
 	Vector3 hero_position;
 	Vector3 villano_position;
 	std::vector<std::vector<Casilla*>> maze;
+
+    struct SmokeCell
+    {
+        Ogre::ParticleSystem* system = nullptr;
+        float emitRemaining = 0.0f;
+        float clearRemaining = 0.0f;
+    };
+    std::vector<std::vector<SmokeCell>> smokeCells;
 	Ogre::SceneNode* backgroundNode;
 	Ogre::SceneNode* floorNode;
 
