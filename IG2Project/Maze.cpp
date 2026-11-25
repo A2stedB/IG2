@@ -3,6 +3,8 @@
 #include <fstream>
 #include "Character.h"
 #include <string>
+#include <OgreSceneManager.h>
+#include <OgreMaterialManager.h>
 
 constexpr const char MURO = 'x';
 constexpr const char HUECO = 'o';
@@ -52,15 +54,21 @@ void Maze::createMaze(std::string stageFileName)
 
 
 
-    Ogre::MeshPtr background_mesh = Ogre::MeshManager::getSingleton().createPlane("background", /*Nombre de la malla creada*/
-        ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, /*El grupo que pertenece este "recurso"*/
-        Plane(Vector3::UNIT_Y, 0), /*El plano y su normal*/
-        1500, 1500, /*Ancho y alto*/
-        50, 50, /*El numero de segmentos en x e y */
-        true, /*Habilitar la normal normal*/
-        1, /*wtf el numero de las coordenadas de textura*/
-        1, 1, /*Los tiles en el que se divide la malla en x e y*/
-        Vector3::UNIT_Z);
+    //Ogre::MeshPtr background_mesh = Ogre::MeshManager::getSingleton().createPlane("background", /*Nombre de la malla creada*/
+    //    ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, /*El grupo que pertenece este "recurso"*/
+    //    Plane(Vector3::UNIT_Y, 0), /*El plano y su normal*/
+    //    1500, 1500, /*Ancho y alto*/
+    //    50, 50, /*El numero de segmentos en x e y */
+    //    true, /*Habilitar la normal normal*/
+    //    1, /*wtf el numero de las coordenadas de textura*/
+    //    1, 1, /*Los tiles en el que se divide la malla en x e y*/
+    //    Vector3::UNIT_Z);
+
+    //Ogre::Entity* backgroundEntity = mSM->createEntity(background_mesh);
+    //backgroundNode->attachObject(backgroundEntity);
+    //backgroundEntity->setMaterialName("spaceskyBackground");
+
+
 
     Ogre::MeshPtr floor_mesh = Ogre::MeshManager::getSingleton().createPlane("floor", /*Nombre de la malla creada*/
         ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, /*El grupo que pertenece este "recurso"*/
@@ -72,9 +80,6 @@ void Maze::createMaze(std::string stageFileName)
         1, 1, /*Los tiles en el que se divide la malla en x e y*/
         Vector3::UNIT_Z);
 
-    Ogre::Entity* backgroundEntity = mSM->createEntity(background_mesh);
-    backgroundNode->attachObject(backgroundEntity);
-    backgroundEntity->setMaterialName("spaceskyBackground");
 
     Ogre::Entity* floorEntity = mSM->createEntity(floor_mesh);
     floorNode->attachObject(floorEntity);

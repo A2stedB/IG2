@@ -1,0 +1,21 @@
+material lavaFloor
+{
+    technique
+    {
+        pass
+        {
+            texture_unit
+            {
+                texture lava.jpg
+                scroll_anim 0.1 0.0
+            }
+
+            texture_unit
+            {
+                texture alphaMask.png
+                colour_op alpha_blend
+                scroll_anim 0.1 0.0
+            }
+        }
+    }
+}

@@ -1,6 +1,6 @@
 19
 19
-grassFloor
+lavaFloor
 stoneWall
 directional
 xxxxxxxxxxxxxxxxxxx

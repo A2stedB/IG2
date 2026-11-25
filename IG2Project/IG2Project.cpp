@@ -315,8 +315,22 @@ void IG2Project::setupScene(void) {
 
 void IG2Project::setup_game_scene()
 {
+    mSM->destroySceneNode(floorNode);
+
     mCamNode->setPosition(0, 1000, 200);
     mCamNode->lookAt(Ogre::Vector3(0, 1, -1.5), Ogre::Node::TS_WORLD);
+
+    for (auto it = Ogre::MaterialManager::getSingleton().getResourceIterator().begin(); it != Ogre::MaterialManager::getSingleton().getResourceIterator().end();++it) {
+        std::cout << it->second->getName() << std::endl << it->second->getGroup() << std::endl;
+    };
+
+    Ogre::Plane plane;
+    plane.d = 1000;
+    plane.normal = Ogre::Vector3::UNIT_Z;
+
+    mSM->setSkyPlane(true, plane, "spaceskyBackground", 1500, 50, true, 1.5, 50, 50);
+
+    bool skyplane_enabled = mSM->isSkyPlaneEnabled();
 
     mMaze = new Maze(Vector3{0,0,0},mSM->getRootSceneNode()->createChildSceneNode(),mSM,"cube.mesh"/*posicion,scenenode,scenemanager,la malla*/);
     mMaze->createMaze("map.txt");
