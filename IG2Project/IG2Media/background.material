@@ -6,8 +6,10 @@ material spaceskyBackground
 		{  
 			texture_unit
 			{
-				texture spacesky.jpg
+				texture spaceSky2.png
 			}
+
+			lighting off
 		}
     }
 }

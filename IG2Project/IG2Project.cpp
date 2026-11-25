@@ -281,7 +281,7 @@ void IG2Project::setupScene(void) {
 
     Ogre::Entity* backgroundEntity = mSM->createEntity(floor_mesh);
     floorNode->attachObject(backgroundEntity);
-    backgroundEntity->setMaterialName("stoneFloorInitial");
+    backgroundEntity->setMaterialName("lavaFloor");
     floorNode->translate(Vector3(0, -50, 0));
     //if (heroLightType == Ogre::Light::LT_DIRECTIONAL) {
 
@@ -326,7 +326,8 @@ void IG2Project::setup_game_scene()
 
     Ogre::Plane plane;
     plane.d = 1000;
-    plane.normal = Ogre::Vector3::UNIT_Z;
+    //plane.normal = Ogre::Vector3::UNIT_Z;
+    plane.normal = Ogre::Vector3(0, 0.5, 1);
 
     mSM->setSkyPlane(true, plane, "spaceskyBackground", 1500, 50, true, 1.5, 50, 50);
 
