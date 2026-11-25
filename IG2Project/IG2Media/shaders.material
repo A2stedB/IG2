@@ -1,0 +1,13 @@
+vertex_program spaceSkyZoomLight glsl
+{
+    source spaceSkyZoomLightVS.glsl
+    default_params
+    {
+        param_named_auto sintime sintime_0_2pi 5
+    }
+}
+
+fragment_program spaceSkyZoomLightFS glsl
+{
+    source spaceSkyZoomLightFS.glsl
+}
